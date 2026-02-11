@@ -1,0 +1,31 @@
+part of 'nextcloud_api.dart';
+
+extension Notes on NextcloudApi {
+  Future<List<Note>?>? getNotes() async {
+    final url = '${cuenta.server}/index.php/apps/notes/api/v1/notes';
+    Map<String, String> headers = {
+      'Authorization': 'Basic $auth}',
+      'OCS-APIRequest': 'true',
+      'Accept': 'application/json',
+    };
+    try {
+      final responseNotes = await dio.get(
+        url,
+        options: Options(headers: headers, responseType: ResponseType.json),
+      );
+      if (responseNotes.statusCode == 200) {
+        var listData = responseNotes.data as List;
+        return listData.map((json) => Note.fromJson(json)).toList();
+        /*if (category != null) {
+          notes = notes.where((note) => note.category == category).toList();
+        }*/
+        //return notes;
+      } else {
+        throw Exception('Error al obtener Notes: ${responseNotes.statusCode}');
+      }
+    } on DioException catch (_) {
+      //throw Exception('Failed to load notes: ${e.message}');
+      return null;
+    }
+  }
+}

@@ -1,0 +1,322 @@
+import 'package:flutter/material.dart';
+
+import '../models/cloud_file.dart';
+import '../models/cuenta_nextcloud.dart';
+import '../models/note.dart';
+import '../services/nextcloud_api/nextcloud_api.dart';
+import '../styles/styles_app.dart';
+import '../widgets/snackbar_manager.dart';
+import 'open_file_screen.dart';
+
+class NotesScreen extends StatefulWidget {
+  final CuentaNextcloud cuenta;
+
+  const NotesScreen({super.key, required this.cuenta});
+
+  @override
+  State<NotesScreen> createState() => _NotesScreenState();
+}
+
+typedef MenuEntry = DropdownMenuEntry<String>;
+
+class _NotesScreenState extends State<NotesScreen> {
+  late NextcloudApi nextcloudApi;
+  List<Note> notesApi = [];
+  List<Note> notes = [];
+  String? category;
+  Set<String> categorias = {''};
+  Map mapCategories = {};
+  String dropdownValue = '';
+  bool filterFavorites = false;
+  bool isLoading = false;
+  bool isGridView = false;
+  Map<Note, CloudFile> mapFiles = {};
+
+  @override
+  void initState() {
+    nextcloudApi = NextcloudApi(cuenta: widget.cuenta);
+    dropdownValue = categorias.first;
+    initNotes();
+    super.initState();
+  }
+
+  Future<void> initNotes() async {
+    setState(() => isLoading = true);
+    final myNotes = await nextcloudApi.getNotes();
+    if (myNotes == null) return;
+
+    List<String> countCategorias = [];
+    for (var note in myNotes) {
+      if (note.category != null) {
+        countCategorias.add(note.category!);
+        categorias.add(note.category!);
+      }
+    }
+    var map = {};
+    for (var cat in countCategorias) {
+      if (!map.containsKey(cat)) {
+        map[cat] = 1;
+      } else {
+        map[cat] += 1;
+      }
+    }
+
+    setState(() {
+      notesApi = myNotes;
+      notes = myNotes;
+      mapCategories = map;
+      isLoading = false;
+    });
+  }
+
+  void onTapNote(Note note) async {
+    //print(note.internalPath);
+    //String path = path_dart.dirname(note.internalPath);
+    //final nextcloudApi = NextcloudApi(cuenta: widget.cuenta);
+    var fileNote =
+        mapFiles[note] ?? await nextcloudApi.getFile(note.internalPath);
+    //var fileNote = await nextcloudApi.getFile(note.internalPath);
+    if (fileNote == null) return;
+    mapFiles[note] = fileNote;
+    if (fileNote.typeFile != null &&
+        fileNote.typeFile!.startsWith('text/plain') &&
+        mounted) {
+      previewTxt(fileNote);
+    } else if (fileNote.typeFile != null &&
+        fileNote.typeFile!.startsWith('text/markdown') &&
+        mounted) {
+      previewMd(fileNote);
+    } else {
+      if (mounted) {
+        SnackbarManager.show(
+          context: context,
+          msg:
+              'Notes only opens text and Markdown files. '
+              'Try opening other formats from Files.',
+          error: true,
+        );
+      }
+    }
+  }
+
+  Future<void> previewTxt(CloudFile note) async {
+    final pathFile = note.filePath(widget.cuenta.userName);
+    if (pathFile == null) return;
+    //final nextcloudApi = NextcloudApi(cuenta: widget.cuenta);
+    final txt = await nextcloudApi.readFile(pathFile);
+    if (txt == null) return;
+    //return txt;
+    if (mounted) {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (context) => OpenFileScreen(
+            file: note,
+            cuenta: widget.cuenta,
+            type: TypeOpenFile.txt,
+            content: txt,
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> previewMd(CloudFile note) async {
+    final pathFile = note.filePath(widget.cuenta.userName);
+    if (pathFile == null) return;
+    //final nextcloudApi = NextcloudApi(cuenta: widget.cuenta);
+    final md = await nextcloudApi.readFile(pathFile);
+    if (md == null) return;
+    if (mounted) {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (context) => OpenFileScreen(
+            file: note,
+            cuenta: widget.cuenta,
+            type: TypeOpenFile.md,
+            content: md,
+          ),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (category != null) {
+      notes = notesApi.where((note) => note.category == category).toList();
+      if (filterFavorites == true) {
+        notes = notes.where((note) => note.favorite == true).toList();
+      }
+    } else {
+      notes = notesApi;
+      if (filterFavorites == true) {
+        notes = notes.where((note) => note.favorite == true).toList();
+      }
+    }
+    return Container(
+      decoration: StylesApp.backgroundScreen(context),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          //title: FittedBox(child: Text(widget.cuenta.name)),
+          title: Text('Notes: ${notes.length}'),
+          actions: [
+            IconButton(
+              onPressed: () {
+                setState(() => filterFavorites = !filterFavorites);
+              },
+              icon: Icon(
+                Icons.star,
+                size: 32,
+                color: filterFavorites == true ? Colors.yellow : Colors.grey,
+              ),
+            ),
+            const SizedBox(width: 10),
+            filterCategory(),
+            const SizedBox(width: 10),
+            IconButton(
+              onPressed: () {
+                setState(() => isGridView = !isGridView);
+              },
+              icon: Icon(Icons.grid_view),
+            ),
+            const SizedBox(width: 10),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          child: Icon(Icons.add),
+        ),
+        body: isLoading
+            ? Center(child: CircularProgressIndicator())
+            : notes.isEmpty
+            ? Center(child: Text('Sin notas'))
+            : LayoutBuilder(
+                builder: (context, constraints) {
+                  if (isGridView) {
+                    int columns = (constraints.maxWidth / 200).floor();
+                    return GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: columns, // Number of columns
+                        crossAxisSpacing: 4, // Space between columns
+                        mainAxisSpacing: 4, // Space between rows
+                      ),
+                      padding: .all(20),
+                      itemCount: notes.length,
+                      itemBuilder: (context, index) {
+                        var note = notes[index];
+                        return Card(
+                          child: InkWell(
+                            onTap: () => onTapNote(note),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: .spaceBetween,
+                                    children: [
+                                      Icon(
+                                        Icons.star,
+                                        color: note.favorite == true
+                                            ? Colors.yellow
+                                            : Colors.grey,
+                                        size: 42,
+                                      ),
+                                      IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(Icons.more_vert),
+                                      ),
+                                    ],
+                                  ),
+                                  Spacer(flex: 1),
+                                  Text(note.title),
+                                  Spacer(flex: 2),
+                                  if (note.category != null &&
+                                      note.category != '')
+                                    FittedBox(
+                                      child: Chip(
+                                        avatar: Icon(Icons.category),
+                                        label: Text(note.category!),
+                                        side: BorderSide.none,
+                                      ),
+                                    ),
+                                  //Text(note.category!),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  } else {
+                    return ListView.builder(
+                      padding: .fromLTRB(20, 20, 20, 60),
+                      itemCount: notes.length,
+                      itemBuilder: (context, index) {
+                        final note = notes[index];
+                        return Card(
+                          child: ListTile(
+                            onTap: () => onTapNote(note),
+                            titleAlignment: ListTileTitleAlignment.top,
+                            leading: Icon(
+                              Icons.star,
+                              color: note.favorite == true
+                                  ? Colors.yellow
+                                  : Colors.grey,
+                              size: 42,
+                            ),
+                            title: Text(note.title),
+                            subtitle: note.category != null
+                                ? Text(note.category!)
+                                : null,
+                            trailing: IconButton(
+                              onPressed: () {},
+                              icon: Icon(Icons.more_vert),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  }
+                },
+              ),
+      ),
+    );
+  }
+
+  DropdownButton<String> filterCategory() {
+    return DropdownButton<String>(
+      value: dropdownValue,
+      //icon: const Icon(Icons.arrow_downward),
+      icon: Icon(Icons.filter_alt_outlined),
+      elevation: 16,
+      style: const TextStyle(color: Colors.blueAccent),
+      underline: Container(height: 2, color: Colors.blueAccent),
+      onChanged: (String? value) {
+        setState(() {
+          category = value;
+          if (value == null || value.isEmpty) {
+            category = null;
+          }
+          dropdownValue = value!;
+        });
+      },
+      items: categorias
+          .map<DropdownMenuItem<String>>(
+            (String value) => DropdownMenuItem<String>(
+              value: value,
+              child: value.isEmpty
+                  ? Text('All')
+                  : Chip(
+                      avatar: CircleAvatar(
+                        child: Text('${mapCategories[value]}'),
+                      ),
+                      label: Text(value),
+                      side: BorderSide.none,
+                    ),
+            ),
+          )
+          .toList(),
+    );
+  }
+}

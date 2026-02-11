@@ -1,10 +1,10 @@
 # Nextflow
 
-## Nextcloud Open Client
+## Open source Nextcloud client
+
+![logo nextcloud](assets/images/Nextcloud-logo-blue-small.png)
 
 ### Cloud workflow: Up, down and share
-
-![logo nextcloud](assets/images/nextcloud-logo-blue-small.png)
 
 **Cliente multicuenta de Nextcloud para Linux y Android.**
 
@@ -61,4 +61,3 @@ Seguridad y privacidad: contraseña encriptada que se almacena en local.
 ⬜ Comparte.
 
 ### Búsqueda global por nombre
-
