@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 enum StatusAuth { login, logout, loading, denied }
 
@@ -7,6 +8,8 @@ class CuentaNextcloud {
   final String userName;
   final String password;
   final StatusAuth statusAuth;
+  String? userId;
+  Uint8List? avatar;
 
   CuentaNextcloud({
     required this.server,

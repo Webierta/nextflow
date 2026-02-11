@@ -6,6 +6,7 @@ import '../models/note.dart';
 import '../services/nextcloud_api/nextcloud_api.dart';
 import '../styles/styles_app.dart';
 import '../widgets/snackbar_manager.dart';
+import '../widgets/title_appbar.dart';
 import 'open_file_screen.dart';
 
 class NotesScreen extends StatefulWidget {
@@ -158,8 +159,10 @@ class _NotesScreenState extends State<NotesScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          //title: FittedBox(child: Text(widget.cuenta.name)),
-          title: Text('Notes: ${notes.length}'),
+          title: TitleAppbar(
+            cuenta: widget.cuenta,
+            title: 'Notes: ${notes.length}',
+          ),
           actions: [
             IconButton(
               onPressed: () {

@@ -9,6 +9,7 @@ import '../services/nextcloud_api/nextcloud_api.dart';
 import '../styles/styles_app.dart';
 import '../utils/format_bytes.dart';
 import '../widgets/snackbar_manager.dart';
+import '../widgets/title_appbar.dart';
 import '../widgets/type_icon.dart';
 import 'open_file_screen.dart';
 
@@ -150,7 +151,9 @@ class _SharedScreenState extends State<SharedScreen> {
       decoration: StylesApp.backgroundScreen(context),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(title: Text('Shared Files')),
+        appBar: AppBar(
+          title: TitleAppbar(cuenta: widget.cuenta, title: 'Shared Files'),
+        ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {},
           child: Icon(Icons.upload),

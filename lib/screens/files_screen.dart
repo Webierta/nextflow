@@ -13,6 +13,7 @@ import '../utils/format_bytes.dart';
 import '../utils/format_dates.dart';
 import '../widgets/open_dialog.dart';
 import '../widgets/snackbar_manager.dart';
+import '../widgets/title_appbar.dart';
 import '../widgets/type_icon.dart';
 import 'gallery_screen.dart';
 import 'open_file_screen.dart';
@@ -157,8 +158,7 @@ class _FilesScreenState extends State<FilesScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          //title: FittedBox(child: Text(widget.cuenta.name)),
-          title: Text('Files'),
+          title: TitleAppbar(cuenta: widget.cuenta, title: 'Files'),
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(kToolbarHeight),
             child: Padding(

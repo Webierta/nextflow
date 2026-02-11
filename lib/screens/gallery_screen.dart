@@ -7,6 +7,7 @@ import '../models/cuenta_nextcloud.dart';
 import '../services/nextcloud_api/nextcloud_api.dart';
 import '../styles/styles_app.dart';
 import '../utils/format_dates.dart';
+import '../widgets/title_appbar.dart';
 import 'open_file_screen.dart';
 
 class GalleryScreen extends StatefulWidget {
@@ -108,7 +109,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
           backgroundColor: Colors.transparent,
           appBar: AppBar(
             //backgroundColor: Colors.blue[900],
-            title: Text('Gallery'),
+            title: TitleAppbar(cuenta: widget.cuenta, title: 'Gallery'),
           ),
           body: Center(
             child: Column(
@@ -138,7 +139,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
             },
             icon: Icon(Icons.arrow_back),
           ),
-          title: Text('Gallery'),
+          //title: Text('Gallery'),
+          title: TitleAppbar(cuenta: widget.cuenta, title: 'Gallery'),
           actions: [
             SizedBox(
               width: 200,

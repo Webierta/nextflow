@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,6 +5,7 @@ import '../models/cuenta_nextcloud.dart';
 import '../providers/cuentas_provider.dart';
 import '../services/nextcloud_api/nextcloud_api.dart';
 import '../styles/styles_app.dart';
+import '../widgets/cuenta_avatar.dart';
 import '../widgets/drawer_app.dart';
 import '../widgets/snackbar_manager.dart';
 import 'add_cuenta_screen.dart';
@@ -80,46 +79,16 @@ class _CuentasScreenState extends ConsumerState<CuentasScreen> {
                   itemCount: cuentas.length,
                   itemBuilder: (context, index) {
                     var cuenta = cuentas[index];
-                    //controllers.add(TextEditingController());
-                    //var controller = controllers[index];
                     var nextcloudApi = NextcloudApi(cuenta: cuenta);
                     return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      padding: const EdgeInsets.symmetric(vertical: 20), //20
                       child: Card(
                         elevation: 10,
-                        //color: Colors.black54,
                         child: Padding(
                           padding: const EdgeInsets.all(10.0),
                           child: ListTile(
                             titleAlignment: ListTileTitleAlignment.top,
-                            leading: FutureBuilder(
-                              future: getAvatar(nextcloudApi),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData &&
-                                    cuenta.statusAuth == StatusAuth.login) {
-                                  return Badge(
-                                    label: Text('✔'),
-                                    backgroundColor: Colors.green,
-                                    alignment: AlignmentGeometry.bottomRight,
-                                    offset: Offset(0, -10),
-                                    child: Image.memory(
-                                      snapshot.data!,
-                                      height: 48,
-                                    ),
-                                  );
-                                }
-                                return Badge(
-                                  label: Text('✖'),
-                                  alignment: AlignmentGeometry.bottomRight,
-                                  offset: Offset(0, -10),
-                                  child: Icon(
-                                    Icons.person_off,
-                                    size: 48,
-                                    color: Colors.grey,
-                                  ),
-                                );
-                              },
-                            ),
+                            leading: CuentaAvatar(cuenta: cuenta),
                             title: FittedBox(
                               fit: BoxFit.scaleDown,
                               alignment: Alignment.centerLeft,
@@ -189,14 +158,6 @@ class _CuentasScreenState extends ConsumerState<CuentasScreen> {
         );
       }
     }
-  }
-
-  Future<Uint8List?>? getAvatar(NextcloudApi nextcloudApi) async {
-    var responseUserId = await nextcloudApi.getUserId();
-    if (responseUserId == null || responseUserId.isEmpty) return null;
-    var responseAvatar = await nextcloudApi.getAvatar(responseUserId);
-    if (responseAvatar == null) return null;
-    return responseAvatar;
   }
 
   void switchFalse(CuentaNextcloud cuenta, NextcloudApi nextcloudApi) {
