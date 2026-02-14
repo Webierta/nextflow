@@ -48,7 +48,13 @@ class _CuentasScreenState extends ConsumerState<CuentasScreen> {
               ),
             );
           },
-          child: Icon(Icons.add),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          tooltip: 'Add count Nextcloud',
+          child: Icon(
+            Icons.add,
+            size: 42,
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
         ),
         body: cuentas.isEmpty
             ? Center(

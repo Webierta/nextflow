@@ -188,7 +188,13 @@ class _NotesScreenState extends State<NotesScreen> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {},
-          child: Icon(Icons.add),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          tooltip: 'Add note',
+          child: Icon(
+            Icons.add,
+            size: 42,
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
         ),
         body: isLoading
             ? Center(child: CircularProgressIndicator())

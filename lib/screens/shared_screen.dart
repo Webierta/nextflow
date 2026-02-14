@@ -156,7 +156,13 @@ class _SharedScreenState extends State<SharedScreen> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {},
-          child: Icon(Icons.upload),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          tooltip: 'Upload shared file',
+          child: Icon(
+            Icons.upload,
+            size: 42,
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
         ),
         body: FutureBuilder<List<SharedFile>?>(
           future: nextcloudApi.getShared(),

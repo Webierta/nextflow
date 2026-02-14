@@ -74,6 +74,34 @@ class _AddCuentaScreenState extends ConsumerState<AddCuentaScreen> {
     }
   }
 
+  void showInfo() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.security, size: 42),
+            const SizedBox(width: 10),
+            Text('Security'),
+          ],
+        ),
+        content: Text(
+          'La contraseña se cifra y almacena segura solo en el dispositivo '
+          'local utilizando el cifrado específico de la plataforma '
+          '(RSA OAEP + AES-GCM en Android por defecto).',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -82,7 +110,9 @@ class _AddCuentaScreenState extends ConsumerState<AddCuentaScreen> {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           title: Text('Add a Nextcloud account'),
-          actions: [IconButton(onPressed: () {}, icon: Icon(Icons.info))],
+          actions: [
+            IconButton(onPressed: () => showInfo(), icon: Icon(Icons.info)),
+          ],
         ),
         body: SingleChildScrollView(
           padding: .symmetric(horizontal: 40),

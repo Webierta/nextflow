@@ -253,7 +253,13 @@ class _FilesScreenState extends State<FilesScreen> {
         floatingActionButton: depth == '1'
             ? FloatingActionButton(
                 onPressed: uploadFile,
-                child: Icon(Icons.upload),
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                tooltip: 'Upload file',
+                child: Icon(
+                  Icons.upload,
+                  size: 42,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
               )
             : null,
         body: (isLoading == true)
