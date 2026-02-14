@@ -1,7 +1,7 @@
 name: nextflow
 description: "Nextcloud Open Client"
 publish_to: 'none'
-version: 0.1.0
+version: 0.1.1
 
 environment:
   sdk: ^3.10.8
@@ -15,6 +15,7 @@ dependencies:
   flutter_secure_storage: ^10.0.0
   intl: ^0.20.2
   markdown_widget: ^2.3.2+8
+  package_info_plus: ^9.0.0
   path: ^1.9.1
   path_provider: ^2.1.5
   printing: ^5.14.2

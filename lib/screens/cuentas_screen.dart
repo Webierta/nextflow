@@ -27,109 +27,111 @@ class _CuentasScreenState extends ConsumerState<CuentasScreen> {
   @override
   Widget build(BuildContext context) {
     final cuentas = ref.watch(cuentasProvider);
-    return Container(
-      decoration: StylesApp.backgroundScreen(context),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        drawer: const DrawerApp(),
-        appBar: AppBar(
-          //automaticallyImplyLeading: false,
+    return SafeArea(
+      child: Container(
+        decoration: StylesApp.backgroundScreen(context),
+        child: Scaffold(
           backgroundColor: Colors.transparent,
-          title: Text(
-            'Nextflow',
-            style: TextStyle(fontWeight: FontWeight.w200),
+          drawer: const DrawerApp(),
+          appBar: AppBar(
+            //automaticallyImplyLeading: false,
+            backgroundColor: Colors.transparent,
+            title: Text(
+              'Nextflow',
+              style: TextStyle(fontWeight: FontWeight.w200),
+            ),
           ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (context) => const AddCuentaScreen(),
-              ),
-            );
-          },
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          tooltip: 'Add count Nextcloud',
-          child: Icon(
-            Icons.add,
-            size: 42,
-            color: Theme.of(context).colorScheme.onPrimary,
-          ),
-        ),
-        body: cuentas.isEmpty
-            ? Center(
-                child: Column(
-                  mainAxisAlignment: .center,
-                  children: [
-                    Text('The sky is clear. Add a cloud.'),
-                    const SizedBox(height: 30),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (context) => const AddCuentaScreen(),
-                          ),
-                        );
-                      },
-                      child: Text('Add a Nextcloud account'),
-                    ),
-                  ],
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => const AddCuentaScreen(),
                 ),
-              )
-            : SingleChildScrollView(
-                physics: ScrollPhysics(),
-                padding: .symmetric(horizontal: 40, vertical: 10),
-                child: ListView.builder(
-                  physics: NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: cuentas.length,
-                  itemBuilder: (context, index) {
-                    var cuenta = cuentas[index];
-                    var nextcloudApi = NextcloudApi(cuenta: cuenta);
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20), //20
-                      child: Card(
-                        elevation: 10,
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: ListTile(
-                            titleAlignment: ListTileTitleAlignment.top,
-                            leading: CuentaAvatar(cuenta: cuenta),
-                            title: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              alignment: Alignment.centerLeft,
-                              child: Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 12,
-                                    backgroundColor:
-                                        cuenta.statusAuth == StatusAuth.login
-                                        ? Colors.green
-                                        : Colors.grey,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(cuenta.name),
-                                ],
-                              ),
+              );
+            },
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            tooltip: 'Add count Nextcloud',
+            child: Icon(
+              Icons.add,
+              size: 42,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
+          ),
+          body: cuentas.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: .center,
+                    children: [
+                      Text('The sky is clear. Add a cloud.'),
+                      const SizedBox(height: 30),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (context) => const AddCuentaScreen(),
                             ),
-                            subtitle: CuentaStage(cuenta: cuenta),
-                            trailing: Switch(
-                              value: cuenta.statusAuth == StatusAuth.login,
-                              onChanged: (bool value) {
-                                if (value == true) {
-                                  switchTrue(cuenta, nextcloudApi);
-                                } else {
-                                  switchFalse(cuenta, nextcloudApi);
-                                }
-                              },
+                          );
+                        },
+                        child: Text('Add a Nextcloud account'),
+                      ),
+                    ],
+                  ),
+                )
+              : SingleChildScrollView(
+                  physics: ScrollPhysics(),
+                  padding: .symmetric(horizontal: 40, vertical: 10),
+                  child: ListView.builder(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: cuentas.length,
+                    itemBuilder: (context, index) {
+                      var cuenta = cuentas[index];
+                      var nextcloudApi = NextcloudApi(cuenta: cuenta);
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20), //20
+                        child: Card(
+                          elevation: 10,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: ListTile(
+                              titleAlignment: ListTileTitleAlignment.top,
+                              leading: CuentaAvatar(cuenta: cuenta),
+                              title: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 12,
+                                      backgroundColor:
+                                          cuenta.statusAuth == StatusAuth.login
+                                          ? Colors.green
+                                          : Colors.grey,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(cuenta.name),
+                                  ],
+                                ),
+                              ),
+                              subtitle: CuentaStage(cuenta: cuenta),
+                              trailing: Switch(
+                                value: cuenta.statusAuth == StatusAuth.login,
+                                onChanged: (bool value) {
+                                  if (value == true) {
+                                    switchTrue(cuenta, nextcloudApi);
+                                  } else {
+                                    switchFalse(cuenta, nextcloudApi);
+                                  }
+                                },
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
-              ),
+        ),
       ),
     );
   }
