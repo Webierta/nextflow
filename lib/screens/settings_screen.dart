@@ -101,13 +101,14 @@ class _ChildreenCuentasState extends ConsumerState<ChildreenCuentas> {
     final cuentas = ref.watch(cuentasProvider);
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
         child: Column(
           children: [
             for (var cuenta in cuentas)
               Padding(
                 padding: const .symmetric(vertical: 10),
                 child: ListTile(
+                  contentPadding: .zero,
                   leading: IconButton(
                     onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute<void>(
@@ -117,27 +118,31 @@ class _ChildreenCuentasState extends ConsumerState<ChildreenCuentas> {
                     ),
                     icon: CircleAvatar(child: Icon(Icons.edit)),
                   ),
-                  title: Text(cuenta.name),
-                  trailing: IconButton.outlined(
-                    onPressed: () async {
-                      final confirmation = await OpenDialog.confirm(
-                        context: context,
-                        title: 'Confirmación requerida',
-                        content: Column(
-                          mainAxisSize: .min,
-                          crossAxisAlignment: .start,
-                          children: [
-                            Text('¿Eliminar esta cuenta?'),
-                            Text(cuenta.name),
-                          ],
-                        ),
-                      );
-                      if (confirmation == true) {
-                        await StorageService.deleteCuenta(cuenta.name);
-                        ref.read(cuentasProvider.notifier).remove(cuenta);
-                      }
-                    },
-                    icon: Icon(Icons.delete),
+                  title: Text(cuenta.userName),
+                  subtitle: Text(cuenta.server),
+                  trailing: Padding(
+                    padding: const EdgeInsets.only(right: 4),
+                    child: IconButton.outlined(
+                      onPressed: () async {
+                        final confirmation = await OpenDialog.confirm(
+                          context: context,
+                          title: 'Confirmación requerida',
+                          content: Column(
+                            mainAxisSize: .min,
+                            crossAxisAlignment: .start,
+                            children: [
+                              Text('¿Eliminar esta cuenta?'),
+                              Text(cuenta.name),
+                            ],
+                          ),
+                        );
+                        if (confirmation == true) {
+                          await StorageService.deleteCuenta(cuenta.name);
+                          ref.read(cuentasProvider.notifier).remove(cuenta);
+                        }
+                      },
+                      icon: Icon(Icons.delete),
+                    ),
                   ),
                 ),
               ),

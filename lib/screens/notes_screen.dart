@@ -5,8 +5,9 @@ import '../models/cuenta_nextcloud.dart';
 import '../models/note.dart';
 import '../services/nextcloud_api/nextcloud_api.dart';
 import '../styles/styles_app.dart';
+import '../widgets/bottom_bar_app.dart';
+import '../widgets/cuenta_avatar.dart';
 import '../widgets/snackbar_manager.dart';
-import '../widgets/title_appbar.dart';
 import 'open_file_screen.dart';
 
 class NotesScreen extends StatefulWidget {
@@ -159,10 +160,21 @@ class _NotesScreenState extends State<NotesScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          title: TitleAppbar(
+          automaticallyImplyLeading: false,
+          leadingWidth: 40,
+          leading: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: CuentaAvatar(
+              cuenta: widget.cuenta,
+              size: 30,
+              onlyAvatar: true,
+            ),
+          ),
+          title: Text('Notes'),
+          /* title: TitleAppbar(
             cuenta: widget.cuenta,
             title: 'Notes: ${notes.length}',
-          ),
+          ),*/
           actions: [
             IconButton(
               onPressed: () {
@@ -196,6 +208,8 @@ class _NotesScreenState extends State<NotesScreen> {
             color: Theme.of(context).colorScheme.onPrimary,
           ),
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+        bottomNavigationBar: BottomBarApp(cuenta: widget.cuenta),
         body: isLoading
             ? Center(child: CircularProgressIndicator())
             : notes.isEmpty

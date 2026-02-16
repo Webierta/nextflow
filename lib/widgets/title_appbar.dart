@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
-
-import '../models/cuenta_nextcloud.dart';
-import 'cuenta_avatar.dart';
+/*
 
 class TitleAppbar extends StatelessWidget {
   final CuentaNextcloud cuenta;
@@ -21,3 +18,4 @@ class TitleAppbar extends StatelessWidget {
     );
   }
 }
+*/

@@ -56,63 +56,40 @@ class _DrawerAppState extends State<DrawerApp> {
                           width: 0,
                         ),
                         color: .new(0x660082C9),
+                        image: DecorationImage(
+                          image: AssetImage(
+                            'assets/images/Nextcloud-logo-blue-small.png',
+                          ),
+                        ),
                       ),
                       child: Column(
-                        crossAxisAlignment: .start,
                         children: [
-                          FittedBox(
-                            child: Row(
-                              mainAxisAlignment: .start,
-                              crossAxisAlignment: .center,
-                              children: [
-                                Column(
-                                  children: [
-                                    Text(
-                                      'Nextflow',
-                                      style: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text(
-                                      packageInfo.version,
-                                      style: TextStyle(fontSize: 11),
-                                    ),
-                                    Image.asset(
-                                      'assets/images/Nextcloud-logo-blue-small.png',
-                                      height: 80,
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(width: 20),
-                                Column(
-                                  //mainAxisAlignment: .start,
-                                  //crossAxisAlignment: .start,
-                                  children: [
-                                    Text(
-                                      'Open source Nextcloud client',
-                                      maxLines: 1,
-                                      style: TextStyle(fontSize: 14),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    /*Text(
-                                      packageInfo.version,
-                                      style: TextStyle(fontSize: 11),
-                                    ),*/
-                                    Text(
-                                      'Cloud workflow:',
-                                      maxLines: 1,
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                    Text(
-                                      'up, down and share',
-                                      maxLines: 1,
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                          Text(
+                            'Nextflow',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w200,
                             ),
+                          ),
+                          //Icon(Icons.cloud_done, size: 42),
+                          Text(
+                            'Nextcloud client',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          Text(
+                            'Version ${packageInfo.version}',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            'Cloud workflow: Up Down Share',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontStyle: FontStyle.italic,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
                           const Spacer(),
                           Row(

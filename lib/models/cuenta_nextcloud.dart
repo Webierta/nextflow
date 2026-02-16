@@ -59,12 +59,24 @@ class CuentaNextcloud {
     String? userName,
     String? password,
     StatusAuth? statusAuth,
+    String? userId,
+    Uint8List? avatar,
   }) {
-    return CuentaNextcloud(
+    CuentaNextcloud cuenta = CuentaNextcloud(
       server: server ?? this.server,
       userName: userName ?? this.userName,
       password: password ?? this.password,
       statusAuth: statusAuth ?? this.statusAuth,
     );
+    cuenta.userId = userId ?? this.userId;
+    cuenta.avatar = avatar ?? this.avatar;
+    return cuenta;
+
+    /*return CuentaNextcloud(
+      server: server ?? this.server,
+      userName: userName ?? this.userName,
+      password: password ?? this.password,
+      statusAuth: statusAuth ?? this.statusAuth,
+    );*/
   }
 }

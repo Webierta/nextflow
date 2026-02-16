@@ -9,10 +9,7 @@ import '../widgets/cuenta_avatar.dart';
 import '../widgets/drawer_app.dart';
 import '../widgets/snackbar_manager.dart';
 import 'add_cuenta_screen.dart';
-import 'files_screen.dart';
-import 'gallery_screen.dart';
-import 'notes_screen.dart';
-import 'shared_screen.dart';
+import 'cuenta_screen.dart';
 
 enum PageRoute { files, shared, notes, gallery }
 
@@ -40,6 +37,15 @@ class _CuentasScreenState extends ConsumerState<CuentasScreen> {
               'Nextflow',
               style: TextStyle(fontWeight: FontWeight.w200),
             ),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  // ABRIR DIALOGO CON TEXTFIELD
+                  // PARA BUSCAR EN TODAS LAS CUENTAS ??
+                },
+                icon: Icon(Icons.search),
+              ),
+            ],
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () {
@@ -79,7 +85,7 @@ class _CuentasScreenState extends ConsumerState<CuentasScreen> {
                 )
               : SingleChildScrollView(
                   physics: ScrollPhysics(),
-                  padding: .symmetric(horizontal: 40, vertical: 10),
+                  padding: .symmetric(horizontal: 20, vertical: 10),
                   child: ListView.builder(
                     physics: NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
@@ -92,38 +98,64 @@ class _CuentasScreenState extends ConsumerState<CuentasScreen> {
                         child: Card(
                           elevation: 10,
                           child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: ListTile(
-                              titleAlignment: ListTileTitleAlignment.top,
-                              leading: CuentaAvatar(cuenta: cuenta),
-                              title: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                alignment: Alignment.centerLeft,
-                                child: Row(
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 12,
-                                      backgroundColor:
-                                          cuenta.statusAuth == StatusAuth.login
-                                          ? Colors.green
-                                          : Colors.grey,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Text(cuenta.name),
-                                  ],
+                            padding: .all(4),
+                            child: Stack(
+                              children: [
+                                ListTile(
+                                  onTap: () {
+                                    if (cuenta.statusAuth == StatusAuth.login) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).removeCurrentSnackBar();
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute<void>(
+                                          builder: (context) =>
+                                              CuentaScreen(cuenta: cuenta),
+                                        ),
+                                      );
+                                    } else {
+                                      SnackbarManager.show(
+                                        context: context,
+                                        msg: 'La cuenta está desconectada.',
+                                        error: true,
+                                      );
+                                    }
+                                  },
+                                  titleAlignment: ListTileTitleAlignment.top,
+                                  leading: CuentaAvatar(cuenta: cuenta),
+                                  horizontalTitleGap: 20,
+                                  title: Row(
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 10,
+                                        backgroundColor:
+                                            cuenta.statusAuth ==
+                                                StatusAuth.login
+                                            ? Colors.green
+                                            : Colors.grey,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(cuenta.userName),
+                                    ],
+                                  ),
+                                  subtitle: Text(cuenta.server),
+                                  contentPadding: .only(left: 4),
                                 ),
-                              ),
-                              subtitle: CuentaStage(cuenta: cuenta),
-                              trailing: Switch(
-                                value: cuenta.statusAuth == StatusAuth.login,
-                                onChanged: (bool value) {
-                                  if (value == true) {
-                                    switchTrue(cuenta, nextcloudApi);
-                                  } else {
-                                    switchFalse(cuenta, nextcloudApi);
-                                  }
-                                },
-                              ),
+                                Positioned(
+                                  right: 0,
+                                  child: Switch(
+                                    value:
+                                        cuenta.statusAuth == StatusAuth.login,
+                                    onChanged: (bool value) {
+                                      if (value == true) {
+                                        conectarCuenta(cuenta, nextcloudApi);
+                                      } else {
+                                        desconectarCuenta(cuenta, nextcloudApi);
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -136,7 +168,7 @@ class _CuentasScreenState extends ConsumerState<CuentasScreen> {
     );
   }
 
-  Future<void> switchTrue(
+  Future<void> conectarCuenta(
     CuentaNextcloud cuenta,
     NextcloudApi nextcloudApi,
   ) async {
@@ -168,7 +200,7 @@ class _CuentasScreenState extends ConsumerState<CuentasScreen> {
     }
   }
 
-  void switchFalse(CuentaNextcloud cuenta, NextcloudApi nextcloudApi) {
+  void desconectarCuenta(CuentaNextcloud cuenta, NextcloudApi nextcloudApi) {
     // desconectar cuenta
     nextcloudApi.deconectar();
     ref
@@ -181,169 +213,5 @@ class _CuentasScreenState extends ConsumerState<CuentasScreen> {
       context: context,
       msg: 'Cuenta desconectada del servidor',
     );
-  }
-}
-
-class CuentaStage extends StatefulWidget {
-  final CuentaNextcloud cuenta;
-
-  const CuentaStage({super.key, required this.cuenta});
-
-  @override
-  State<CuentaStage> createState() => _CuentaStageState();
-}
-
-class _CuentaStageState extends State<CuentaStage> {
-  TextEditingController controller = TextEditingController();
-  bool ocultoSearch = true;
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (widget.cuenta.statusAuth != StatusAuth.login) {
-      return SizedBox.shrink();
-    }
-    return Padding(
-      padding: const EdgeInsets.only(top: 30),
-      child: Column(
-        crossAxisAlignment: .start,
-        children: [
-          Wrap(
-            //spacing: 0,
-            runSpacing: 20,
-            children: [
-              SizedBox(
-                width: 180,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton.icon(
-                    onPressed: onPageRoute(
-                      pageRoute: PageRoute.files,
-                      cuenta: widget.cuenta,
-                    ),
-                    label: Text('Files'),
-                    icon: Icon(Icons.folder_open, size: 42),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 180,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton.icon(
-                    onPressed: onPageRoute(
-                      pageRoute: PageRoute.shared,
-                      cuenta: widget.cuenta,
-                    ),
-                    label: Text('Shared'),
-                    icon: Icon(Icons.folder_shared_outlined, size: 42),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 180,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton.icon(
-                    onPressed: onPageRoute(
-                      pageRoute: PageRoute.notes,
-                      cuenta: widget.cuenta,
-                    ),
-                    label: Text('Notes'),
-                    icon: Icon(Icons.article_outlined, size: 42),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 180,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton.icon(
-                    onPressed: onPageRoute(
-                      pageRoute: PageRoute.gallery,
-                      cuenta: widget.cuenta,
-                    ),
-                    label: Text('Gallery'),
-                    icon: Icon(Icons.photo_library_outlined, size: 42),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 180,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton.icon(
-                    onPressed: () {
-                      controller.clear();
-                      setState(() {
-                        ocultoSearch = !ocultoSearch;
-                      });
-                    },
-                    label: Text('Search'),
-                    icon: Icon(Icons.manage_search, size: 42),
-                  ),
-                ),
-              ),
-              Offstage(
-                offstage: ocultoSearch,
-                child: SizedBox(
-                  width: 180,
-                  child: TextField(
-                    controller: controller,
-                    onChanged: (value) {
-                      setState(() {});
-                    },
-                    decoration: InputDecoration(
-                      isDense: true,
-                      suffixIcon: IconButton(
-                        onPressed: controller.text.trim().isEmpty
-                            ? null
-                            : onPageRoute(
-                                pageRoute: PageRoute.files,
-                                cuenta: widget.cuenta,
-                                inputSearch: controller.text,
-                              ),
-                        icon: Icon(Icons.open_in_new),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-        ],
-      ),
-    );
-  }
-
-  Null Function()? onPageRoute({
-    required PageRoute pageRoute,
-    required CuentaNextcloud cuenta,
-    String? inputSearch,
-  }) {
-    //if (cuenta.statusAuth != StatusAuth.login) return null;
-    var page = switch (pageRoute) {
-      //PageRoute.files => FilesScreen(cuenta: cuenta),
-      PageRoute.files => FilesScreen(cuenta: cuenta, inputSearch: inputSearch),
-      PageRoute.shared => SharedScreen(cuenta: cuenta),
-      PageRoute.notes => NotesScreen(cuenta: cuenta),
-      PageRoute.gallery => GalleryScreen(cuenta: cuenta),
-      //PageRoute.gallery => GalleryScreen2(cuenta: cuenta),
-    };
-    //controller.clear();
-
-    return () {
-      ScaffoldMessenger.of(context).removeCurrentSnackBar();
-      controller.clear();
-      Navigator.of(
-        context,
-      ).push(MaterialPageRoute<void>(builder: (context) => page));
-    };
   }
 }

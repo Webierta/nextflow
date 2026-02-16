@@ -8,8 +8,9 @@ import '../models/shared_file.dart';
 import '../services/nextcloud_api/nextcloud_api.dart';
 import '../styles/styles_app.dart';
 import '../utils/format_bytes.dart';
+import '../widgets/bottom_bar_app.dart';
+import '../widgets/cuenta_avatar.dart';
 import '../widgets/snackbar_manager.dart';
-import '../widgets/title_appbar.dart';
 import '../widgets/type_icon.dart';
 import 'open_file_screen.dart';
 
@@ -152,7 +153,18 @@ class _SharedScreenState extends State<SharedScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          title: TitleAppbar(cuenta: widget.cuenta, title: 'Shared Files'),
+          automaticallyImplyLeading: false,
+          leadingWidth: 40,
+          leading: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: CuentaAvatar(
+              cuenta: widget.cuenta,
+              size: 30,
+              onlyAvatar: true,
+            ),
+          ),
+          title: Text('Shared files'),
+          //title: TitleAppbar(cuenta: widget.cuenta, title: 'Shared Files'),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {},
@@ -164,6 +176,8 @@ class _SharedScreenState extends State<SharedScreen> {
             color: Theme.of(context).colorScheme.onPrimary,
           ),
         ),
+        bottomNavigationBar: BottomBarApp(cuenta: widget.cuenta),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
         body: FutureBuilder<List<SharedFile>?>(
           future: nextcloudApi.getShared(),
           builder: (context, snapshot) {

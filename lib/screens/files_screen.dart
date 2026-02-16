@@ -11,9 +11,10 @@ import '../services/nextcloud_api/nextcloud_api.dart';
 import '../styles/styles_app.dart';
 import '../utils/format_bytes.dart';
 import '../utils/format_dates.dart';
+import '../widgets/bottom_bar_app.dart';
+import '../widgets/cuenta_avatar.dart';
 import '../widgets/open_dialog.dart';
 import '../widgets/snackbar_manager.dart';
-import '../widgets/title_appbar.dart';
 import '../widgets/type_icon.dart';
 import 'gallery_screen.dart';
 import 'open_file_screen.dart';
@@ -158,12 +159,22 @@ class _FilesScreenState extends State<FilesScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          title: TitleAppbar(cuenta: widget.cuenta, title: 'Files'),
+          automaticallyImplyLeading: false,
+          leadingWidth: 40,
+          leading: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: CuentaAvatar(
+              cuenta: widget.cuenta,
+              size: 30,
+              onlyAvatar: true,
+            ),
+          ),
+          title: Text('Files'),
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(kToolbarHeight),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(10, 10, 25, 10),
-              child: depth == '1'
+              child: depth == '1' && searchController.text.isEmpty
                   ? Row(
                       children: [
                         IconButton(
@@ -203,16 +214,55 @@ class _FilesScreenState extends State<FilesScreen> {
                     )
                   : Padding(
                       padding: const .only(left: 10),
-                      child: Text(
-                        'Searching: ${widget.inputSearch!}',
+                      /*child: Text(
+                        'Searching: ${widget.inputSearch ?? searchController.text}',
                         style: TextStyle(fontSize: 22),
+                      ),*/
+                      child: InputChip(
+                        avatar: Icon(Icons.search),
+                        label: Text(
+                          widget.inputSearch ?? searchController.text,
+                        ),
+                        onDeleted: () {
+                          if (searchController.text.isNotEmpty) {
+                            setState(() {
+                              searchController.clear();
+                            });
+                          }
+                          if (widget.inputSearch != null) {
+                            ScaffoldMessenger.of(
+                              context,
+                            ).removeCurrentSnackBar();
+                            Navigator.of(context).pop();
+                          }
+                        },
                       ),
                     ),
             ),
           ),
           actions: [
             if (depth == '1')
-              SizedBox(
+              IconButton(
+                onPressed: () async {
+                  searchController.clear();
+                  final search = await OpenDialog.inputName(
+                    context: context,
+                    title: 'Search in this folder',
+                    icon: Icons.search,
+                    controller: searchController,
+                  );
+                  //searchController.clear();
+                  if (search != null &&
+                      search.trim().isNotEmpty &&
+                      context.mounted) {
+                    setState(() {
+                      searchController.text = search;
+                    });
+                  }
+                },
+                icon: Icon(Icons.search),
+              ),
+            /*SizedBox(
                 width: 250,
                 child: TextField(
                   controller: searchController,
@@ -235,7 +285,7 @@ class _FilesScreenState extends State<FilesScreen> {
                     ),
                   ),
                 ),
-              ),
+              ),*/
             IconButton(
               onPressed: () async {},
               icon: Icon(isGridView ? Icons.grid_view : Icons.view_list),
@@ -262,6 +312,8 @@ class _FilesScreenState extends State<FilesScreen> {
                 ),
               )
             : null,
+        bottomNavigationBar: BottomBarApp(cuenta: widget.cuenta),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
         body: (isLoading == true)
             ? Center(
                 child: Transform.scale(

@@ -7,7 +7,8 @@ import '../models/cuenta_nextcloud.dart';
 import '../services/nextcloud_api/nextcloud_api.dart';
 import '../styles/styles_app.dart';
 import '../utils/format_dates.dart';
-import '../widgets/title_appbar.dart';
+import '../widgets/bottom_bar_app.dart';
+import '../widgets/cuenta_avatar.dart';
 import 'open_file_screen.dart';
 
 class GalleryScreen extends StatefulWidget {
@@ -108,8 +109,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
         child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
+            automaticallyImplyLeading: false,
             //backgroundColor: Colors.blue[900],
-            title: TitleAppbar(cuenta: widget.cuenta, title: 'Gallery'),
+            title: Text('Gallery'),
+            //title: TitleAppbar(cuenta: widget.cuenta, title: 'Gallery'),
           ),
           body: Center(
             child: Column(
@@ -131,16 +134,28 @@ class _GalleryScreenState extends State<GalleryScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
+          automaticallyImplyLeading: false,
+          leadingWidth: 40,
+          leading: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: CuentaAvatar(
+              cuenta: widget.cuenta,
+              size: 30,
+              onlyAvatar: true,
+            ),
+          ),
+          title: Text('Gallery'),
+
           //backgroundColor: Colors.blue[900],
-          leading: IconButton(
+          /*leading: IconButton(
             onPressed: () {
               reset();
               Navigator.of(context).pop();
             },
             icon: Icon(Icons.arrow_back),
-          ),
+          ),*/
           //title: Text('Gallery'),
-          title: TitleAppbar(cuenta: widget.cuenta, title: 'Gallery'),
+          //title: TitleAppbar(cuenta: widget.cuenta, title: 'Gallery'),
           actions: [
             SizedBox(
               width: 200,
@@ -185,7 +200,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
             child: Align(
               alignment: Alignment.topLeft,
               child: Padding(
-                padding: const .only(left: 70, bottom: 6),
+                padding: const .only(left: 14, bottom: 6),
                 child: Text(
                   '${imagesPreview.length} images in ${widget.pathGallery}',
                   maxLines: 1,
@@ -195,6 +210,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
             ),
           ),
         ),
+        //floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+        bottomNavigationBar: BottomBarApp(cuenta: widget.cuenta),
         body: (isLoading == true && imagesPreview.isEmpty)
             ? Center(
                 child: Transform.scale(
