@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'models/cuenta_nextcloud.dart';
 import 'providers/cuentas_provider.dart';
-import 'screens/cuentas_screen.dart';
+import 'screens/cuenta_screen.dart';
 import 'services/storage_service.dart';
 import 'styles/theme_app.dart';
 
@@ -51,7 +51,8 @@ class _MainAppState extends ConsumerState<MainApp> {
       themeMode: ThemeMode.dark,
       theme: ThemeApp.lightThemeData,
       darkTheme: ThemeApp.darkThemeData,
-      home: CuentasScreen(),
+      //home: CuentasScreen(),
+      home: CuentaScreen(),
     );
   }
 }

@@ -71,12 +71,5 @@ class CuentaNextcloud {
     cuenta.userId = userId ?? this.userId;
     cuenta.avatar = avatar ?? this.avatar;
     return cuenta;
-
-    /*return CuentaNextcloud(
-      server: server ?? this.server,
-      userName: userName ?? this.userName,
-      password: password ?? this.password,
-      statusAuth: statusAuth ?? this.statusAuth,
-    );*/
   }
 }

@@ -9,7 +9,6 @@ import '../widgets/cuenta_avatar.dart';
 import '../widgets/drawer_app.dart';
 import '../widgets/snackbar_manager.dart';
 import 'add_cuenta_screen.dart';
-import 'cuenta_screen.dart';
 
 enum PageRoute { files, shared, notes, gallery }
 
@@ -107,12 +106,12 @@ class _CuentasScreenState extends ConsumerState<CuentasScreen> {
                                       ScaffoldMessenger.of(
                                         context,
                                       ).removeCurrentSnackBar();
-                                      Navigator.of(context).push(
+                                      /*Navigator.of(context).push(
                                         MaterialPageRoute<void>(
                                           builder: (context) =>
                                               CuentaScreen(cuenta: cuenta),
                                         ),
-                                      );
+                                      );*/
                                     } else {
                                       SnackbarManager.show(
                                         context: context,

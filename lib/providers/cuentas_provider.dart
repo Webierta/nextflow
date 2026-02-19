@@ -1,11 +1,13 @@
+import 'dart:typed_data';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/cuenta_nextcloud.dart';
 
 final cuentasProvider =
-NotifierProvider<CuentasNotifier, List<CuentaNextcloud>>(
-  CuentasNotifier.new,
-);
+    NotifierProvider<CuentasNotifier, List<CuentaNextcloud>>(
+      CuentasNotifier.new,
+    );
 
 class CuentasNotifier extends Notifier<List<CuentaNextcloud>> {
   @override
@@ -27,12 +29,13 @@ class CuentasNotifier extends Notifier<List<CuentaNextcloud>> {
       state = state.where((c) => c.name != cuenta.name).toList();
 
   void edit(
-      CuentaNextcloud cuenta, {
-        String? newServer,
-        String? newUser,
-        String? newPassword,
-        StatusAuth? newStatusAuth,
-      }) {
+    CuentaNextcloud cuenta, {
+    String? newServer,
+    String? newUser,
+    String? newPassword,
+    StatusAuth? newStatusAuth,
+    Uint8List? newAvatar,
+  }) {
     final newCuenta = CuentaNextcloud(
       server: newServer ?? cuenta.server,
       userName: newUser ?? cuenta.userName,
@@ -40,6 +43,7 @@ class CuentasNotifier extends Notifier<List<CuentaNextcloud>> {
       statusAuth: newStatusAuth ?? cuenta.statusAuth,
     );
     state[state.indexOf(cuenta)] = newCuenta;
+    newCuenta.avatar = newAvatar ?? newCuenta.avatar;
   }
 
   void clear() {

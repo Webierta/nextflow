@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/cuenta_nextcloud.dart';
 import '../models/destino.dart';
-import '../screens/cuentas_screen.dart';
+import '../screens/cuenta_screen.dart';
 
 class BottomBarApp extends StatelessWidget {
   final CuentaNextcloud cuenta;
@@ -23,7 +23,7 @@ class BottomBarApp extends StatelessWidget {
                 ScaffoldMessenger.of(context).removeCurrentSnackBar();
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
-                    builder: (context) => CuentasScreen(),
+                    builder: (context) => CuentaScreen(cuentaSelect: cuenta),
                   ),
                 );
               },

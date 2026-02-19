@@ -28,6 +28,7 @@ class _CuentaAvatarState extends State<CuentaAvatar> {
   @override
   void initState() {
     nextcloudApi = NextcloudApi(cuenta: widget.cuenta);
+    size = widget.size ?? 48;
     super.initState();
   }
 
@@ -44,13 +45,11 @@ class _CuentaAvatarState extends State<CuentaAvatar> {
   Widget build(BuildContext context) {
     if (widget.cuenta.avatar != null &&
         widget.cuenta.statusAuth == StatusAuth.login) {
+      //if (widget.cuenta.avatar != null) {
       if (widget.onlyAvatar == true) {
         return Image.memory(widget.cuenta.avatar!, height: size, width: size);
       }
-      return BadgeAvatar(
-        bytes: widget.cuenta.avatar!,
-        size: widget.size ?? size,
-      );
+      return BadgeAvatar(bytes: widget.cuenta.avatar!, size: size);
     }
 
     if (widget.cuenta.statusAuth != StatusAuth.login) {
@@ -64,6 +63,7 @@ class _CuentaAvatarState extends State<CuentaAvatar> {
       future: getAvatar(),
       builder: (context, snapshot) {
         if (snapshot.hasData && widget.cuenta.statusAuth == StatusAuth.login) {
+          //if (snapshot.hasData) {
           if (widget.onlyAvatar == true) {
             return Image.memory(
               widget.cuenta.avatar!,
@@ -71,12 +71,12 @@ class _CuentaAvatarState extends State<CuentaAvatar> {
               width: size,
             );
           }
-          return BadgeAvatar(bytes: snapshot.data!, size: widget.size ?? size);
+          return BadgeAvatar(bytes: snapshot.data!, size: size);
         }
         if (widget.onlyAvatar == true) {
           return Icon(Icons.person_off, size: size, color: Colors.grey);
         }
-        return BadgePerson(size: widget.size ?? size);
+        return BadgePerson(size: size);
       },
     );
   }
