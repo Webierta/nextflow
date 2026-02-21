@@ -51,7 +51,7 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Seleciona una cuenta'),
+          title: Text('Conecta la nube'),
           content: Column(
             mainAxisSize: .min,
             children: [
@@ -125,6 +125,24 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
     }
   }
 
+  void desconectarCuenta() {
+    if (cuentaSelect == null) return;
+    var nextcloudApi = NextcloudApi(cuenta: cuentaSelect!);
+    nextcloudApi.deconectar();
+    ref.read(cuentasProvider.notifier).desconectar(cuentaSelect!);
+    setState(() {
+      cuentaSelect = cuentaSelect!.copyWith(statusAuth: StatusAuth.logout);
+      cuentaSelect = cuentaSelect!.copyWith(avatar: null);
+      cuentaSelect = null;
+    });
+    if (mounted) {
+      SnackbarManager.show(
+        context: context,
+        msg: 'Cuenta desconectada del servidor',
+      );
+    }
+  }
+
   Future<void> searchGlobal() async {
     final search = await OpenDialog.inputName(
       context: context,
@@ -151,7 +169,6 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
   }) {
     if (cuentaSelect != null && cuentaSelect!.statusAuth == StatusAuth.login) {
       if (destino != null) {
-        //return destino.onPageRoute(context: context, cuenta: cuentaSelect!);
         var onPage = destino.onPageRoute(
           context: context,
           cuenta: cuentaSelect!,
@@ -208,14 +225,37 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
         appBar: AppBar(
           leadingWidth: 30,
           title: cuentaSelect == null
-              ? Text('Ninguna cuenta seleccionada')
-              : Text(cuentaSelect!.userName),
+              ? Text('Nextflow', style: TextStyle(fontWeight: FontWeight.w200))
+              : Row(
+                  children: [
+                    CuentaAvatar(cuenta: cuentaSelect!, size: 30),
+                    const SizedBox(width: 10),
+                    Text(cuentaSelect!.userName),
+                  ],
+                ),
           actions: [
             if (cuentaSelect != null)
-              CuentaAvatar(cuenta: cuentaSelect!, size: 30),
-            IconButton(
+              Padding(
+                padding: const .only(right: 4),
+                child: IconButton.outlined(
+                  tooltip: cuentaSelect!.statusAuth == StatusAuth.login
+                      ? 'Desconectar'
+                      : 'Conectar',
+                  onPressed: cuentaSelect!.statusAuth == StatusAuth.login
+                      ? desconectarCuenta
+                      : conectarCuenta,
+                  icon: Icon(
+                    cuentaSelect!.statusAuth == StatusAuth.login
+                        ? Icons.cloud_done
+                        : Icons.cloud_off,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            IconButton.outlined(
+              tooltip: 'Select count',
               onPressed: () => selectCuenta(cuentas),
-              icon: Icon(Icons.arrow_drop_down),
+              icon: Icon(Icons.arrow_drop_down, color: Colors.white),
             ),
           ],
         ),
@@ -241,7 +281,6 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
                       child: InkWell(
                         onTap: () =>
                             onTapDestino(context: context, destino: destino),
-                        //onTap: onTapDestino(context: context, destino: destino),
                         child: FittedBox(
                           fit: BoxFit.scaleDown,
                           child: Column(
@@ -259,19 +298,25 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
                   }),
                 ),
                 Center(
-                  child: Container(
-                    padding: .all(10),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.blue,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: sizeIcon,
+                      maxWidth: sizeIcon,
                     ),
-                    child: IconButton(
-                      onPressed: () =>
-                          onTapDestino(context: context, isSearch: true),
-                      icon: Icon(
-                        Icons.search,
-                        size: sizeIcon / 2,
-                        color: Colors.white,
+                    child: Container(
+                      padding: .all(10),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.blue,
+                      ),
+                      child: IconButton(
+                        onPressed: () =>
+                            onTapDestino(context: context, isSearch: true),
+                        icon: Icon(
+                          Icons.search,
+                          size: sizeIcon / 2,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),

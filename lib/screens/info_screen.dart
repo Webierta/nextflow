@@ -40,7 +40,7 @@ class _InfoScreenState extends State<InfoScreen> {
       decoration: StylesApp.backgroundScreen(context),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(),
+        appBar: AppBar(title: Text('Info')),
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),

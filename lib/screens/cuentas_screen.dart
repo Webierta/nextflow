@@ -1,3 +1,4 @@
+/*
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -106,12 +107,12 @@ class _CuentasScreenState extends ConsumerState<CuentasScreen> {
                                       ScaffoldMessenger.of(
                                         context,
                                       ).removeCurrentSnackBar();
-                                      /*Navigator.of(context).push(
+                                      Navigator.of(context).push(
                                         MaterialPageRoute<void>(
                                           builder: (context) =>
                                               CuentaScreen(cuenta: cuenta),
                                         ),
-                                      );*/
+                                      );
                                     } else {
                                       SnackbarManager.show(
                                         context: context,
@@ -214,3 +215,4 @@ class _CuentasScreenState extends ConsumerState<CuentasScreen> {
     );
   }
 }
+*/

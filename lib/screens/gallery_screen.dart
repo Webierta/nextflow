@@ -9,6 +9,7 @@ import '../styles/styles_app.dart';
 import '../utils/format_dates.dart';
 import '../widgets/bottom_bar_app.dart';
 import '../widgets/cuenta_avatar.dart';
+import '../widgets/open_dialog.dart';
 import 'open_file_screen.dart';
 
 class GalleryScreen extends StatefulWidget {
@@ -137,7 +138,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
           automaticallyImplyLeading: false,
           leadingWidth: 40,
           leading: Padding(
-            padding: const EdgeInsets.all(4.0),
+            padding: const EdgeInsets.only(left: 4),
             child: CuentaAvatar(
               cuenta: widget.cuenta,
               size: 30,
@@ -145,7 +146,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
             ),
           ),
           title: Text('Gallery'),
-
           //backgroundColor: Colors.blue[900],
           /*leading: IconButton(
             onPressed: () {
@@ -157,21 +157,34 @@ class _GalleryScreenState extends State<GalleryScreen> {
           //title: Text('Gallery'),
           //title: TitleAppbar(cuenta: widget.cuenta, title: 'Gallery'),
           actions: [
-            SizedBox(
-              width: 200,
-              child: TextField(
-                controller: searchController,
-                onChanged: (value) => setState(() {}),
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.search),
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      setState(() => searchController.clear());
-                    },
-                    icon: Icon(Icons.clear),
-                  ),
-                ),
+            if (searchController.text.isNotEmpty)
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    searchController.clear();
+                  });
+                },
+                icon: Icon(Icons.clear),
               ),
+            IconButton(
+              tooltip: 'Search image by name',
+              onPressed: () async {
+                searchController.clear();
+                final search = await OpenDialog.inputName(
+                  context: context,
+                  title: 'Search in this folder',
+                  icon: Icons.search,
+                  controller: searchController,
+                );
+                if (search != null &&
+                    search.trim().isNotEmpty &&
+                    context.mounted) {
+                  setState(() {
+                    searchController.text = search;
+                  });
+                }
+              },
+              icon: Icon(Icons.search, size: 32, color: Colors.white),
             ),
             IconButton(
               onPressed: () {
@@ -179,7 +192,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   imagesPreview.sort((a, b) => a.name.compareTo(b.name));
                 });
               },
-              icon: Icon(Icons.sort_by_alpha, color: Colors.white),
+              icon: Icon(Icons.sort_by_alpha, size: 32, color: Colors.white),
             ),
             IconButton(
               onPressed: () {
@@ -191,7 +204,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   });
                 });
               },
-              icon: Icon(Icons.date_range, color: Colors.white),
+              icon: Icon(Icons.date_range, size: 32, color: Colors.white),
             ),
             const SizedBox(width: 10),
           ],
@@ -200,7 +213,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
             child: Align(
               alignment: Alignment.topLeft,
               child: Padding(
-                padding: const .only(left: 14, bottom: 6),
+                padding: const .only(left: 10, bottom: 6),
                 child: Text(
                   '${imagesPreview.length} images in ${widget.pathGallery}',
                   maxLines: 1,

@@ -6,7 +6,7 @@ import '../providers/cuentas_provider.dart';
 import '../services/storage_service.dart';
 import '../styles/styles_app.dart';
 import '../widgets/snackbar_manager.dart';
-import 'cuentas_screen.dart';
+import 'cuenta_screen.dart';
 
 class AddCuentaScreen extends ConsumerStatefulWidget {
   final CuentaNextcloud? cuentaEdit;
@@ -69,7 +69,7 @@ class _AddCuentaScreenState extends ConsumerState<AddCuentaScreen> {
     //ref.read(cuentasProvider.notifier).edit...
     if (mounted) {
       Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (context) => const CuentasScreen()),
+        MaterialPageRoute<void>(builder: (context) => const CuentaScreen()),
       );
     }
   }

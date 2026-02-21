@@ -33,6 +33,7 @@ class _NotesScreenState extends State<NotesScreen> {
   bool isLoading = false;
   bool isGridView = false;
   Map<Note, CloudFile> mapFiles = {};
+  int totalNotes = 0;
 
   @override
   void initState() {
@@ -68,6 +69,7 @@ class _NotesScreenState extends State<NotesScreen> {
       notes = myNotes;
       mapCategories = map;
       isLoading = false;
+      totalNotes = myNotes.length;
     });
   }
 
@@ -170,33 +172,43 @@ class _NotesScreenState extends State<NotesScreen> {
               onlyAvatar: true,
             ),
           ),
-          title: Text('Notes'),
-          /* title: TitleAppbar(
-            cuenta: widget.cuenta,
-            title: 'Notes: ${notes.length}',
-          ),*/
+          title: Text('Notes: ${notes.length}'),
           actions: [
-            IconButton(
-              onPressed: () {
-                setState(() => filterFavorites = !filterFavorites);
-              },
-              icon: Icon(
-                Icons.star,
-                size: 32,
-                color: filterFavorites == true ? Colors.yellow : Colors.grey,
-              ),
-            ),
-            const SizedBox(width: 10),
-            filterCategory(),
-            const SizedBox(width: 10),
             IconButton(
               onPressed: () {
                 setState(() => isGridView = !isGridView);
               },
-              icon: Icon(Icons.grid_view),
+              icon: Icon(Icons.grid_view, size: 32, color: Colors.white),
             ),
-            const SizedBox(width: 10),
           ],
+          bottom: isLoading == false && notes.isNotEmpty
+              ? PreferredSize(
+                  preferredSize: const Size.fromHeight(kToolbarHeight),
+                  child: Padding(
+                    padding: .symmetric(horizontal: 20),
+                    child: Row(
+                      mainAxisAlignment: .spaceBetween,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            setState(() => filterFavorites = !filterFavorites);
+                          },
+                          icon: Icon(
+                            Icons.star,
+                            size: 32,
+                            color: filterFavorites == true
+                                ? Colors.yellow
+                                : Colors.grey,
+                          ),
+                        ),
+                        //const SizedBox(width: 10),
+                        const Spacer(),
+                        filterCategory(),
+                      ],
+                    ),
+                  ),
+                )
+              : null,
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {},
@@ -307,39 +319,74 @@ class _NotesScreenState extends State<NotesScreen> {
     );
   }
 
-  DropdownButton<String> filterCategory() {
-    return DropdownButton<String>(
-      value: dropdownValue,
-      //icon: const Icon(Icons.arrow_downward),
-      icon: Icon(Icons.filter_alt_outlined),
-      elevation: 16,
-      style: const TextStyle(color: Colors.blueAccent),
-      underline: Container(height: 2, color: Colors.blueAccent),
-      onChanged: (String? value) {
-        setState(() {
-          category = value;
-          if (value == null || value.isEmpty) {
-            category = null;
-          }
-          dropdownValue = value!;
-        });
-      },
-      items: categorias
-          .map<DropdownMenuItem<String>>(
-            (String value) => DropdownMenuItem<String>(
-              value: value,
-              child: value.isEmpty
-                  ? Text('All')
-                  : Chip(
-                      avatar: CircleAvatar(
-                        child: Text('${mapCategories[value]}'),
+  Widget filterCategory() {
+    return Expanded(
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10.0),
+          border: Border.all(
+            //color: Colors.red,
+            style: BorderStyle.solid,
+            width: 0.80,
+          ),
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            isExpanded: true,
+            value: dropdownValue,
+            //icon: const Icon(Icons.arrow_downward),
+            icon: Icon(Icons.filter_alt_outlined, size: 32),
+            elevation: 16,
+            //style: const TextStyle(color: Colors.blueAccent),
+            //underline: Container(height: 2, color: Colors.blueAccent),
+            onChanged: (String? value) {
+              setState(() {
+                category = value;
+                if (value == null || value.isEmpty) {
+                  category = null;
+                }
+                dropdownValue = value!;
+              });
+            },
+            items: categorias
+                .map<DropdownMenuItem<String>>(
+                  (String value) => DropdownMenuItem<String>(
+                    value: value,
+                    child: FittedBox(
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            child: Text(
+                              value.isEmpty
+                                  ? '$totalNotes'
+                                  : '${mapCategories[value]}',
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Text(value.isEmpty ? 'All' : value),
+                        ],
                       ),
-                      label: Text(value),
-                      side: BorderSide.none,
                     ),
-            ),
-          )
-          .toList(),
+                    /*child: value.isEmpty
+                        ? Text('All')
+                        : FittedBox(
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  child: Text('${mapCategories[value]}'),
+                                ),
+                                const SizedBox(width: 10),
+                                Text(value),
+                              ],
+                            ),
+                          ),*/
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -42,8 +42,26 @@ class CuentasNotifier extends Notifier<List<CuentaNextcloud>> {
       password: newPassword ?? cuenta.password,
       statusAuth: newStatusAuth ?? cuenta.statusAuth,
     );
-    state[state.indexOf(cuenta)] = newCuenta;
     newCuenta.avatar = newAvatar ?? newCuenta.avatar;
+    if (state.contains(cuenta)) {
+      state[state.indexOf(cuenta)] = newCuenta;
+    }
+  }
+
+  void desconectar(CuentaNextcloud cuenta) {
+    state = state.map((c) {
+      if (c.name == cuenta.name) {
+        return c.copyWith(statusAuth: StatusAuth.logout);
+      } else {
+        return c;
+      }
+    }).toList();
+
+    /*for (int i = 0; i < state.length; i++) {
+      if(state[i].name == cuenta.name){
+        state[i].copyWith(statusAuth: StatusAuth.logout);
+      }
+    }*/
   }
 
   void clear() {

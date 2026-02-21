@@ -10,7 +10,6 @@ import '../widgets/cuenta_avatar.dart';
 import '../widgets/open_dialog.dart';
 import '../widgets/snackbar_manager.dart';
 import 'add_cuenta_screen.dart';
-import 'cuenta_screen.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -41,7 +40,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            leading: IconButton(
+            /*leading: IconButton(
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
@@ -50,7 +49,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 );
               },
               icon: Icon(Icons.arrow_back),
-            ),
+            ),*/
             title: Text('Settings'),
           ),
           body: SingleChildScrollView(

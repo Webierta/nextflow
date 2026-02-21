@@ -12,11 +12,11 @@ class BottomBarApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
-      child: Row(
+      child: Wrap(
         children: [
           Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: IconButton(
+            padding: const EdgeInsets.only(right: 8),
+            child: IconButton.filledTonal(
               tooltip: 'Home',
               icon: const Icon(Icons.home, size: 32),
               onPressed: () {
@@ -31,7 +31,7 @@ class BottomBarApp extends StatelessWidget {
           ),
           for (var destino in Destino.values)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
               child: IconButton(
                 tooltip: destino.name,
                 icon: Icon(destino.icon, size: 32),

@@ -1,11 +1,13 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/cuenta_nextcloud.dart';
+import '../providers/cuentas_provider.dart';
 import '../services/nextcloud_api/nextcloud_api.dart';
 
-class CuentaAvatar extends StatefulWidget {
+class CuentaAvatar extends ConsumerStatefulWidget {
   final CuentaNextcloud cuenta;
   final double? size;
   final bool? onlyAvatar;
@@ -18,10 +20,10 @@ class CuentaAvatar extends StatefulWidget {
   });
 
   @override
-  State<CuentaAvatar> createState() => _CuentaAvatarState();
+  ConsumerState createState() => _CuentaAvatarState();
 }
 
-class _CuentaAvatarState extends State<CuentaAvatar> {
+class _CuentaAvatarState extends ConsumerState<CuentaAvatar> {
   late NextcloudApi nextcloudApi;
   double size = 48;
 
@@ -38,6 +40,9 @@ class _CuentaAvatarState extends State<CuentaAvatar> {
     var responseAvatar = await nextcloudApi.getAvatar(responseUserId);
     widget.cuenta.avatar = responseAvatar;
     if (responseAvatar == null) return null;
+    ref
+        .read(cuentasProvider.notifier)
+        .edit(widget.cuenta, newAvatar: responseAvatar);
     return responseAvatar;
   }
 

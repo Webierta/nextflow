@@ -170,79 +170,75 @@ class _FilesScreenState extends State<FilesScreen> {
             ),
           ),
           title: Text('Files'),
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(kToolbarHeight),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(10, 10, 25, 10),
-              child: depth == '1' && searchController.text.isEmpty
-                  ? Row(
-                      children: [
-                        IconButton(
-                          onPressed: currentPath == '/'
-                              ? null
-                              : () {
-                                  setState(() {
-                                    if (paths.isNotEmpty) {
-                                      int indexCurrentPath = paths.indexOf(
-                                        currentPath,
-                                      );
-                                      if (indexCurrentPath > 0) {
-                                        currentPath =
-                                            paths[indexCurrentPath - 1];
-                                      }
-                                      initFiles();
-                                    }
-                                  });
-                                },
-                          icon: Icon(
-                            Icons.drive_folder_upload_rounded,
-                            size: 32,
+          bottom: isLoading == true
+              ? null
+              : PreferredSize(
+                  preferredSize: const Size.fromHeight(kToolbarHeight),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                    child: depth == '1' && searchController.text.isEmpty
+                        ? Row(
+                            children: [
+                              IconButton(
+                                onPressed: currentPath == '/'
+                                    ? null
+                                    : () {
+                                        setState(() {
+                                          if (paths.isNotEmpty) {
+                                            int indexCurrentPath = paths
+                                                .indexOf(currentPath);
+                                            if (indexCurrentPath > 0) {
+                                              currentPath =
+                                                  paths[indexCurrentPath - 1];
+                                            }
+                                            initFiles();
+                                          }
+                                        });
+                                      },
+                                icon: Icon(
+                                  Icons.drive_folder_upload_rounded,
+                                  size: 32,
+                                ),
+                              ),
+                              Expanded(
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Text(
+                                    currentPath == '/'
+                                        ? 'Home'
+                                        : 'Home${currentPath.substring(1)}',
+                                    style: TextStyle(fontSize: 16),
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                        : InputChip(
+                            //avatar: Icon(Icons.search),
+                            label: Text(
+                              widget.inputSearch ?? searchController.text,
+                            ),
+                            onDeleted: () {
+                              if (searchController.text.isNotEmpty) {
+                                setState(() {
+                                  searchController.clear();
+                                });
+                              }
+                              if (widget.inputSearch != null) {
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).removeCurrentSnackBar();
+                                Navigator.of(context).pop();
+                              }
+                            },
                           ),
-                        ),
-                        Text(
-                          currentPath == '/'
-                              ? 'Home'
-                              : 'Home${currentPath.substring(1)}',
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        const Spacer(),
-                        IconButton.filled(
-                          onPressed: addFolder,
-                          icon: Icon(Icons.create_new_folder),
-                        ),
-                      ],
-                    )
-                  : Padding(
-                      padding: const .only(left: 10),
-                      /*child: Text(
-                        'Searching: ${widget.inputSearch ?? searchController.text}',
-                        style: TextStyle(fontSize: 22),
-                      ),*/
-                      child: InputChip(
-                        avatar: Icon(Icons.search),
-                        label: Text(
-                          widget.inputSearch ?? searchController.text,
-                        ),
-                        onDeleted: () {
-                          if (searchController.text.isNotEmpty) {
-                            setState(() {
-                              searchController.clear();
-                            });
-                          }
-                          if (widget.inputSearch != null) {
-                            ScaffoldMessenger.of(
-                              context,
-                            ).removeCurrentSnackBar();
-                            Navigator.of(context).pop();
-                          }
-                        },
-                      ),
-                    ),
-            ),
-          ),
+                  ),
+                ),
           actions: [
-            if (depth == '1')
+            if (depth == '1') ...[
               IconButton(
+                tooltip: 'Search in this folder',
                 onPressed: () async {
                   searchController.clear();
                   final search = await OpenDialog.inputName(
@@ -251,7 +247,6 @@ class _FilesScreenState extends State<FilesScreen> {
                     icon: Icons.search,
                     controller: searchController,
                   );
-                  //searchController.clear();
                   if (search != null &&
                       search.trim().isNotEmpty &&
                       context.mounted) {
@@ -260,44 +255,18 @@ class _FilesScreenState extends State<FilesScreen> {
                     });
                   }
                 },
-                icon: Icon(Icons.search),
+                icon: Icon(Icons.search, size: 32, color: Colors.white),
               ),
-            /*SizedBox(
-                width: 250,
-                child: TextField(
-                  controller: searchController,
-                  onChanged: (value) => setState(() {
-                    //depth = '1';
-                  }),
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.search),
-                    hint: Text(
-                      'Search in this folder',
-                      maxLines: 1,
-                      style: TextStyle(color: Colors.white30),
-                    ),
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() => searchController.clear());
-                        //initFiles();
-                      },
-                      icon: Icon(Icons.clear),
-                    ),
-                  ),
+              IconButton(
+                tooltip: 'Create new folder here',
+                onPressed: addFolder,
+                icon: Icon(
+                  Icons.create_new_folder,
+                  size: 32,
+                  color: Colors.white,
                 ),
-              ),*/
-            IconButton(
-              onPressed: () async {},
-              icon: Icon(isGridView ? Icons.grid_view : Icons.view_list),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(right: 10.0),
-              child: IconButton(
-                //onPressed: () => reset(),
-                onPressed: () => initFiles(),
-                icon: Icon(Icons.update),
               ),
-            ),
+            ],
           ],
         ),
         floatingActionButton: depth == '1'
