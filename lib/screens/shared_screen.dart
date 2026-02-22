@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../models/cloud_file.dart';
 import '../models/cuenta_nextcloud.dart';
+import '../models/destino.dart';
 import '../models/shared_file.dart';
 import '../services/nextcloud_api/nextcloud_api.dart';
 import '../styles/styles_app.dart';
@@ -176,7 +177,10 @@ class _SharedScreenState extends State<SharedScreen> {
             color: Theme.of(context).colorScheme.onPrimary,
           ),
         ),
-        bottomNavigationBar: BottomBarApp(cuenta: widget.cuenta),
+        bottomNavigationBar: BottomBarApp(
+          cuenta: widget.cuenta,
+          destino: Destino.shared,
+        ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
         body: FutureBuilder<List<SharedFile>?>(
           future: nextcloudApi.getShared(),

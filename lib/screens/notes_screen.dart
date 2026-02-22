@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/cloud_file.dart';
 import '../models/cuenta_nextcloud.dart';
+import '../models/destino.dart';
 import '../models/note.dart';
 import '../services/nextcloud_api/nextcloud_api.dart';
 import '../styles/styles_app.dart';
@@ -178,14 +179,18 @@ class _NotesScreenState extends State<NotesScreen> {
               onPressed: () {
                 setState(() => isGridView = !isGridView);
               },
-              icon: Icon(Icons.grid_view, size: 32, color: Colors.white),
+              icon: Icon(
+                isGridView ? Icons.list : Icons.grid_view,
+                size: 32,
+                color: Colors.white,
+              ),
             ),
           ],
           bottom: isLoading == false
               ? PreferredSize(
                   preferredSize: const Size.fromHeight(kToolbarHeight),
                   child: Padding(
-                    padding: .symmetric(horizontal: 20),
+                    padding: .symmetric(horizontal: 20, vertical: 10),
                     child: Row(
                       mainAxisAlignment: .spaceBetween,
                       children: [
@@ -221,7 +226,10 @@ class _NotesScreenState extends State<NotesScreen> {
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-        bottomNavigationBar: BottomBarApp(cuenta: widget.cuenta),
+        bottomNavigationBar: BottomBarApp(
+          cuenta: widget.cuenta,
+          destino: Destino.notes,
+        ),
         body: isLoading
             ? Center(child: CircularProgressIndicator())
             : notes.isEmpty
@@ -243,41 +251,38 @@ class _NotesScreenState extends State<NotesScreen> {
                         return Card(
                           child: InkWell(
                             onTap: () => onTapNote(note),
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: .spaceBetween,
-                                    children: [
-                                      Icon(
-                                        Icons.star,
-                                        color: note.favorite == true
-                                            ? Colors.yellow
-                                            : Colors.grey,
-                                        size: 42,
-                                      ),
-                                      IconButton(
-                                        onPressed: () {},
-                                        icon: Icon(Icons.more_vert),
-                                      ),
-                                    ],
-                                  ),
-                                  Spacer(flex: 1),
-                                  Text(note.title),
-                                  Spacer(flex: 2),
-                                  if (note.category != null &&
-                                      note.category != '')
-                                    FittedBox(
-                                      child: Chip(
-                                        avatar: Icon(Icons.category),
-                                        label: Text(note.category!),
-                                        side: BorderSide.none,
-                                      ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: .spaceBetween,
+                                  children: [
+                                    Icon(
+                                      Icons.star,
+                                      color: note.favorite == true
+                                          ? Colors.yellow
+                                          : Colors.grey,
+                                      size: 42,
                                     ),
-                                  //Text(note.category!),
-                                ],
-                              ),
+                                    IconButton(
+                                      onPressed: () {},
+                                      icon: Icon(Icons.more_vert),
+                                    ),
+                                  ],
+                                ),
+                                Spacer(flex: 1),
+                                Text(note.title),
+                                Spacer(flex: 2),
+                                if (note.category != null &&
+                                    note.category != '')
+                                  FittedBox(
+                                    child: Chip(
+                                      avatar: Icon(Icons.category),
+                                      label: Text(note.category!),
+                                      side: BorderSide.none,
+                                    ),
+                                  ),
+                                //Text(note.category!),
+                              ],
                             ),
                           ),
                         );
@@ -321,69 +326,73 @@ class _NotesScreenState extends State<NotesScreen> {
 
   Widget filterCategory() {
     return Expanded(
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10.0),
-          border: Border.all(
-            //color: Colors.red,
-            style: BorderStyle.solid,
-            width: 0.80,
+      flex: 8,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 10.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10.0),
+            border: Border.all(
+              //color: Colors.red,
+              style: BorderStyle.solid,
+              width: 0.80,
+            ),
           ),
-        ),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            isExpanded: true,
-            value: dropdownValue,
-            //icon: const Icon(Icons.arrow_downward),
-            icon: Icon(Icons.filter_alt_outlined, size: 32),
-            elevation: 16,
-            //style: const TextStyle(color: Colors.blueAccent),
-            //underline: Container(height: 2, color: Colors.blueAccent),
-            onChanged: (String? value) {
-              setState(() {
-                category = value;
-                if (value == null || value.isEmpty) {
-                  category = null;
-                }
-                dropdownValue = value!;
-              });
-            },
-            items: categorias
-                .map<DropdownMenuItem<String>>(
-                  (String value) => DropdownMenuItem<String>(
-                    value: value,
-                    child: FittedBox(
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            child: Text(
-                              value.isEmpty
-                                  ? '$totalNotes'
-                                  : '${mapCategories[value]}',
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              isExpanded: true,
+              value: dropdownValue,
+              //icon: const Icon(Icons.arrow_downward),
+              icon: Icon(Icons.filter_alt_outlined, size: 32),
+              elevation: 16,
+              //style: const TextStyle(color: Colors.blueAccent),
+              //underline: Container(height: 2, color: Colors.blueAccent),
+              onChanged: (String? value) {
+                setState(() {
+                  category = value;
+                  if (value == null || value.isEmpty) {
+                    category = null;
+                  }
+                  dropdownValue = value!;
+                });
+              },
+              items: categorias
+                  .map<DropdownMenuItem<String>>(
+                    (String value) => DropdownMenuItem<String>(
+                      value: value,
+                      child: FittedBox(
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              child: Text(
+                                value.isEmpty
+                                    ? '$totalNotes'
+                                    : '${mapCategories[value]}',
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 10),
-                          Text(value.isEmpty ? 'All' : value),
-                        ],
+                            const SizedBox(width: 10),
+                            Text(value.isEmpty ? 'All' : value),
+                          ],
+                        ),
                       ),
+                      /*child: value.isEmpty
+                          ? Text('All')
+                          : FittedBox(
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    child: Text('${mapCategories[value]}'),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(value),
+                                ],
+                              ),
+                            ),*/
                     ),
-                    /*child: value.isEmpty
-                        ? Text('All')
-                        : FittedBox(
-                            child: Row(
-                              children: [
-                                CircleAvatar(
-                                  child: Text('${mapCategories[value]}'),
-                                ),
-                                const SizedBox(width: 10),
-                                Text(value),
-                              ],
-                            ),
-                          ),*/
-                  ),
-                )
-                .toList(),
+                  )
+                  .toList(),
+            ),
           ),
         ),
       ),

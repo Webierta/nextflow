@@ -7,6 +7,7 @@ import 'package:path/path.dart' as path_dart;
 
 import '../models/cloud_file.dart';
 import '../models/cuenta_nextcloud.dart';
+import '../models/destino.dart';
 import '../services/nextcloud_api/nextcloud_api.dart';
 import '../styles/styles_app.dart';
 import '../utils/format_bytes.dart';
@@ -281,7 +282,10 @@ class _FilesScreenState extends State<FilesScreen> {
                 ),
               )
             : null,
-        bottomNavigationBar: BottomBarApp(cuenta: widget.cuenta),
+        bottomNavigationBar: BottomBarApp(
+          cuenta: widget.cuenta,
+          destino: Destino.files,
+        ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
         body: (isLoading == true)
             ? Center(

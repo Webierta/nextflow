@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../models/cloud_file.dart';
 import '../models/cuenta_nextcloud.dart';
+import '../models/destino.dart';
 import '../services/nextcloud_api/nextcloud_api.dart';
 import '../styles/styles_app.dart';
 import '../utils/format_dates.dart';
@@ -224,7 +225,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
           ),
         ),
         //floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-        bottomNavigationBar: BottomBarApp(cuenta: widget.cuenta),
+        bottomNavigationBar: BottomBarApp(
+          cuenta: widget.cuenta,
+          destino: Destino.gallery,
+        ),
         body: (isLoading == true && imagesPreview.isEmpty)
             ? Center(
                 child: Transform.scale(

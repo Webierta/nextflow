@@ -1,10 +1,10 @@
 # Nextflow
 
-## Open source Nextcloud client
+## Nextcloud Open Client
 
 ![logo nextcloud](assets/images/Nextcloud-logo-blue-small.png)
 
-### Cloud workflow: Up, down and share
+### *Cloud workflow: Up Down Share*
 
 **Cliente multicuenta de Nextcloud para Linux y Android.**
 
