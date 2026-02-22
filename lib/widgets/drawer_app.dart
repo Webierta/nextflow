@@ -73,7 +73,7 @@ class _DrawerAppState extends State<DrawerApp> {
                           ),
                           //Icon(Icons.cloud_done, size: 42),
                           Text(
-                            'Nextcloud client',
+                            'Nextcloud Open Client',
                             style: TextStyle(fontSize: 16),
                           ),
                           Text(
@@ -86,7 +86,7 @@ class _DrawerAppState extends State<DrawerApp> {
                           Text(
                             'Cloud workflow: Up Down Share',
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 14,
                               fontStyle: FontStyle.italic,
                             ),
                             textAlign: TextAlign.center,

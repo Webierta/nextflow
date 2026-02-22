@@ -181,7 +181,7 @@ class _NotesScreenState extends State<NotesScreen> {
               icon: Icon(Icons.grid_view, size: 32, color: Colors.white),
             ),
           ],
-          bottom: isLoading == false && notes.isNotEmpty
+          bottom: isLoading == false
               ? PreferredSize(
                   preferredSize: const Size.fromHeight(kToolbarHeight),
                   child: Padding(

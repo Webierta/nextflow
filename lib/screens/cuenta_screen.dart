@@ -246,8 +246,8 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
                       : conectarCuenta,
                   icon: Icon(
                     cuentaSelect!.statusAuth == StatusAuth.login
-                        ? Icons.cloud_done
-                        : Icons.cloud_off,
+                        ? Icons.cloud_off
+                        : Icons.cloud_done,
                     color: Colors.white,
                   ),
                 ),
@@ -264,7 +264,8 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
             double childAspectRatio =
                 constraints.maxWidth / constraints.maxHeight;
             double sizeIcon = childAspectRatio * 150;
-            double sizeFont = childAspectRatio * 30;
+            double sizeFont = childAspectRatio * 40;
+            //double sizeSearch = childAspectRatio * 80;
             return Stack(
               children: [
                 GridView.count(
@@ -298,10 +299,35 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
                   }),
                 ),
                 Center(
+                  child: FractionallySizedBox(
+                    heightFactor: 0.3,
+                    widthFactor: 0.3,
+                    child: Container(
+                      padding: .all(20),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.blue,
+                      ),
+                      child: FittedBox(
+                        child: IconButton(
+                          padding: .zero,
+                          onPressed: () =>
+                              onTapDestino(context: context, isSearch: true),
+                          icon: Icon(
+                            Icons.search,
+                            size: sizeIcon / 2,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                /*Center(
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
-                      maxHeight: sizeIcon,
-                      maxWidth: sizeIcon,
+                      maxHeight: constraints.maxHeight / 2,
+                      maxWidth: constraints.maxWidth / 2,
                     ),
                     child: Container(
                       padding: .all(10),
@@ -310,6 +336,7 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
                         color: Colors.blue,
                       ),
                       child: IconButton(
+                        padding: .zero,
                         onPressed: () =>
                             onTapDestino(context: context, isSearch: true),
                         icon: Icon(
@@ -320,7 +347,7 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
                       ),
                     ),
                   ),
-                ),
+                ),*/
               ],
             );
           },
