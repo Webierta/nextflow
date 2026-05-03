@@ -94,7 +94,24 @@ class OpenFileScreen extends StatelessWidget {
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(title: Text(file.getName())),
+        appBar: AppBar(
+          /*leading: IconButton(
+            onPressed: () {
+              if (context.mounted) {
+                Navigator.pop(context);
+                */
+          /*Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (context) => FilesScreen(cuenta: cuenta),
+                  ),
+                );*/
+          /*
+              }
+            },
+            icon: Icon(Icons.arrow_back),
+          ),*/
+          title: Text(file.getName()),
+        ),
         body: body,
         bottomNavigationBar: BottomAppBar(
           height: 45,

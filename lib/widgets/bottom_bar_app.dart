@@ -7,13 +7,21 @@ import '../screens/cuenta_screen.dart';
 class BottomBarApp extends StatelessWidget {
   final CuentaNextcloud cuenta;
   final Destino destino;
+  final Future<void> Function()? funcion;
+  final String? depth;
 
-  const BottomBarApp({super.key, required this.cuenta, required this.destino});
+  const BottomBarApp({
+    super.key,
+    required this.cuenta,
+    required this.destino,
+    this.funcion,
+    this.depth,
+  });
 
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
-      child: Wrap(
+      child: Row(
         children: [
           Padding(
             padding: const EdgeInsets.only(right: 8),
@@ -42,6 +50,20 @@ class BottomBarApp extends StatelessWidget {
                 ),
                 onPressed: dest.onPageRoute(context: context, cuenta: cuenta),
               ),
+            ),
+          const Spacer(),
+          if (funcion != null && depth == '1')
+            IconButton.filled(
+              onPressed: funcion,
+              icon: Icon(Icons.upload),
+              iconSize: 42,
+              tooltip: 'Upload file',
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+              //style: ButtonStyle(shape: WidgetStatePropertyAll()),
             ),
         ],
       ),

@@ -270,7 +270,7 @@ class _FilesScreenState extends State<FilesScreen> {
             ],
           ],
         ),
-        floatingActionButton: depth == '1'
+        /*floatingActionButton: depth == '1'
             ? FloatingActionButton(
                 onPressed: uploadFile,
                 backgroundColor: Theme.of(context).colorScheme.primary,
@@ -281,12 +281,14 @@ class _FilesScreenState extends State<FilesScreen> {
                   color: Theme.of(context).colorScheme.onPrimary,
                 ),
               )
-            : null,
+            : null,*/
         bottomNavigationBar: BottomBarApp(
           cuenta: widget.cuenta,
           destino: Destino.files,
+          funcion: uploadFile,
+          depth: depth,
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+        //floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
         body: (isLoading == true)
             ? Center(
                 child: Transform.scale(

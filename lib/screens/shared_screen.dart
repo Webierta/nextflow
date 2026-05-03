@@ -167,7 +167,7 @@ class _SharedScreenState extends State<SharedScreen> {
           title: Text('Shared files'),
           //title: TitleAppbar(cuenta: widget.cuenta, title: 'Shared Files'),
         ),
-        floatingActionButton: FloatingActionButton(
+        /*floatingActionButton: FloatingActionButton(
           onPressed: () {},
           backgroundColor: Theme.of(context).colorScheme.primary,
           tooltip: 'Upload shared file',
@@ -176,12 +176,13 @@ class _SharedScreenState extends State<SharedScreen> {
             size: 42,
             color: Theme.of(context).colorScheme.onPrimary,
           ),
-        ),
+        ),*/
         bottomNavigationBar: BottomBarApp(
           cuenta: widget.cuenta,
           destino: Destino.shared,
+          //funcion: null,
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+        //floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
         body: FutureBuilder<List<SharedFile>?>(
           future: nextcloudApi.getShared(),
           builder: (context, snapshot) {

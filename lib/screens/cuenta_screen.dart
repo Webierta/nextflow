@@ -255,7 +255,8 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
             IconButton.outlined(
               tooltip: 'Select count',
               onPressed: () => selectCuenta(cuentas),
-              icon: Icon(Icons.arrow_drop_down, color: Colors.white),
+              icon: Icon(Icons.cloud, color: Colors.white),
+              // arrow_drop_down
             ),
           ],
         ),

@@ -215,7 +215,7 @@ class _NotesScreenState extends State<NotesScreen> {
                 )
               : null,
         ),
-        floatingActionButton: FloatingActionButton(
+        /*floatingActionButton: FloatingActionButton(
           onPressed: () {},
           backgroundColor: Theme.of(context).colorScheme.primary,
           tooltip: 'Add note',
@@ -224,11 +224,12 @@ class _NotesScreenState extends State<NotesScreen> {
             size: 42,
             color: Theme.of(context).colorScheme.onPrimary,
           ),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+        ),*/
+        //floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
         bottomNavigationBar: BottomBarApp(
           cuenta: widget.cuenta,
           destino: Destino.notes,
+          funcion: null,
         ),
         body: isLoading
             ? Center(child: CircularProgressIndicator())
