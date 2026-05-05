@@ -252,12 +252,13 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
                   ),
                 ),
               ),
-            IconButton.outlined(
-              tooltip: 'Select count',
-              onPressed: () => selectCuenta(cuentas),
-              icon: Icon(Icons.cloud, color: Colors.white),
-              // arrow_drop_down
-            ),
+            if (cuentaSelect == null)
+              IconButton.outlined(
+                tooltip: 'Select count',
+                onPressed: () => selectCuenta(cuentas),
+                icon: Icon(Icons.cloud, color: Colors.white),
+                // arrow_drop_down
+              ),
           ],
         ),
         body: LayoutBuilder(

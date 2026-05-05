@@ -15,16 +15,17 @@ class BottomBarApp extends StatelessWidget {
     required this.cuenta,
     required this.destino,
     this.funcion,
-    this.depth,
+    this.depth = '1',
   });
 
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
+      height: 70,
       child: Row(
         children: [
           Padding(
-            padding: const EdgeInsets.only(right: 8),
+            padding: const EdgeInsets.only(right: 4),
             child: IconButton.filledTonal(
               tooltip: 'Home',
               icon: const Icon(Icons.home, size: 32),
@@ -40,7 +41,7 @@ class BottomBarApp extends StatelessWidget {
           ),
           for (var dest in Destino.values)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 4),
               child: IconButton(
                 tooltip: dest.name,
                 icon: Icon(
@@ -56,7 +57,7 @@ class BottomBarApp extends StatelessWidget {
             IconButton.filled(
               onPressed: funcion,
               icon: Icon(Icons.upload),
-              iconSize: 42,
+              //iconSize: 32,
               tooltip: 'Upload file',
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(

@@ -34,6 +34,15 @@ extension _OnTapMore on _FilesScreenState {
                     },
                   ),
                   ListTile(
+                    leading: Icon(Icons.share),
+                    title: Text('Shared'),
+                    onTap: () {
+                      Navigator.pop(contextBottomSheet);
+                      sharedFile(item);
+                    },
+                  ),
+                  Divider(),
+                  ListTile(
                     leading: Icon(Icons.drive_file_rename_outline),
                     title: Text('Rename'),
                     onTap: () {
@@ -63,6 +72,7 @@ extension _OnTapMore on _FilesScreenState {
                     },
                   ),
                   if (item.isDirectory) ...[
+                    Divider(),
                     ListTile(
                       leading:
                           //folderPathSelect == '${widget.cuenta.server}${item.href}'
@@ -114,6 +124,7 @@ extension _OnTapMore on _FilesScreenState {
                         );
                       },
                     ),
+                  Divider(),
                   ListTile(
                     leading: Icon(Icons.delete),
                     title: Text('Delete'),
@@ -131,6 +142,26 @@ extension _OnTapMore on _FilesScreenState {
     );
   }
 
+  Future<void> sharedFile(CloudFile file) async {
+    String path = '$currentPath/${file.name}';
+    (bool, String) shareFile = await nextcloudApi.shrareFile(path);
+    if (shareFile.$1 == true) {
+      await Clipboard.setData(ClipboardData(text: shareFile.$2));
+      initFiles();
+    }
+    //if (mounted) {
+    //await Clipboard.setData(ClipboardData(text: shareFile.$2));
+    if (!mounted) return;
+    SnackbarManager.show(
+      context: context,
+      msg: shareFile.$1 == true
+          ? 'Shared link copied to clipboard'
+          : 'Error de shared',
+      error: !shareFile.$1,
+    );
+    //}
+  }
+
   Future<void> downloadFile(CloudFile file) async {
     //var path = '${currentPath.substring(1)}/${item.name}';
     String path = '$currentPath/${file.name}';
@@ -141,7 +172,9 @@ extension _OnTapMore on _FilesScreenState {
     if (mounted) {
       SnackbarManager.show(
         context: context,
-        msg: download == true ? 'File downloaded' : 'Error de descarga',
+        msg: download == true
+            ? 'File downloaded to downloads directory'
+            : 'Error de descarga',
         error: !download,
       );
     }
