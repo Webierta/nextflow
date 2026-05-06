@@ -15,6 +15,8 @@ import '../widgets/snackbar_manager.dart';
 import '../widgets/type_icon.dart';
 import 'open_file_screen.dart';
 
+part 'shared_screen_on_tap_more.dart';
+
 class SharedScreen extends StatefulWidget {
   final CuentaNextcloud cuenta;
 
@@ -259,23 +261,30 @@ class _SharedScreenState extends State<SharedScreen> {
                           FittedBox(
                             child: Row(
                               children: [
-                                Text(FormatBytes.show(item.itemSize)),
+                                Text(
+                                  FormatBytes.show(item.itemSize),
+                                  maxLines: 2,
+                                ),
                                 Text(' - '),
                                 Text(item.mimeType),
                               ],
                             ),
                           ),
-                          if (item.sharedLink != null)
+                          /*if (item.sharedLink != null)
                             Text(
                               item.sharedLink!,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                            ),
+                            ),*/
                           //if (item.sharedId != null) Text(item.sharedId!),
                         ],
                       ),
-                      trailing: Wrap(
-                        //mainAxisSize: MainAxisSize.min,
+                      trailing: IconButton(
+                        onPressed: () =>
+                            onTapMore(context: context, item: item),
+                        icon: Icon(Icons.more_vert),
+                      ),
+                      /*trailing: Wrap(
                         children: [
                           IconButton(
                             onPressed: item.sharedLink == null
@@ -325,8 +334,6 @@ class _SharedScreenState extends State<SharedScreen> {
                                     if (!context.mounted) return;
                                     if (noCompartir == true) {
                                       setState(() {});
-                                      //await nextcloudApi.getShared();
-                                      //if (!context.mounted) return;
                                       SnackbarManager.show(
                                         context: context,
                                         msg:
@@ -344,7 +351,7 @@ class _SharedScreenState extends State<SharedScreen> {
                             icon: Icon(Icons.link_off),
                           ),
                         ],
-                      ),
+                      ),*/
                     );
                   },
                 ),
