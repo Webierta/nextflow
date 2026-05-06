@@ -9,12 +9,15 @@ class SharedFile extends OpenFile {
   final int itemSize;
   final String? sharedLink;
 
+  final String? sharedId;
+
   SharedFile({
     required this.sharedPath,
     required this.itemType,
     required this.mimeType,
     required this.itemSize,
     this.sharedLink,
+    this.sharedId,
   });
 
   String get name {
@@ -34,6 +37,7 @@ class SharedFile extends OpenFile {
       mimeType: jsonData['mimetype'],
       itemSize: jsonData['item_size'],
       sharedLink: jsonData['url'] ?? jsonData['share_with_link'],
+      sharedId: jsonData['id'] ?? 0,
     );
   }
 
@@ -50,6 +54,7 @@ class SharedFile extends OpenFile {
     detalles['Type'] = itemType;
     detalles['MimeType'] = mimeType;
     detalles['Size'] = itemSize.toString();
+    //detalles['Id'] = sharedId.toString();
     return detalles;
   }
 }

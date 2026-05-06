@@ -100,7 +100,8 @@ class _FilesScreenState extends State<FilesScreen> {
   }
 
   Future<void> uploadFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    //FilePickerResult? result = await FilePicker.platform.pickFiles();
+    FilePickerResult? result = await FilePicker.pickFiles();
     if (result == null) return;
     File file = File(result.files.single.path!);
     bool responseUpload = await nextcloudApi.uploadFile(

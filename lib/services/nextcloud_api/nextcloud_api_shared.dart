@@ -18,11 +18,24 @@ extension Shared on NextcloudApi {
         List<SharedFile> sharedFiles = listData
             .map((item) => SharedFile.fromJson(item))
             .toList();
-        sharedFiles.sort(
+        /*sharedFiles.sort(
           (a, b) =>
               a.sharedPath.toLowerCase().compareTo(b.sharedPath.toLowerCase()),
+        );*/
+        //return sharedFiles;
+        final shareDir = sharedFiles
+            .where((item) => item.itemType == 'folder')
+            .toList();
+        shareDir.sort(
+          (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
         );
-        return sharedFiles;
+        final shareFiles = sharedFiles
+            .where((item) => item.itemType != 'folder')
+            .toList();
+        shareFiles.sort(
+          (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+        );
+        return shareDir + shareFiles;
       } else {
         throw Exception('Error al obtener Shared: ${response.statusCode}');
       }
@@ -72,6 +85,30 @@ extension Shared on NextcloudApi {
     } catch (e) {
       //print('Error al compartir archivo: $e');
       return (false, '');
+    }
+  }
+
+  Future<bool> unshareFile(int shareId, {int shareType = 3}) async {
+    final url =
+        '${cuenta.server}/ocs/v2.php/apps/files_sharing/api/v1/shares/$shareId';
+    Map<String, String> headers = {
+      'Authorization': 'Basic $auth}',
+      'OCS-APIRequest': 'true',
+    };
+    try {
+      final response = await dio.delete(
+        url,
+        options: Options(headers: headers),
+      );
+      if (response.statusCode == 200) {
+        //print('Compartición eliminada con éxito');
+        return true;
+      } else {
+        //print('Error: ${response.data}');
+        return false;
+      }
+    } catch (e) {
+      return false;
     }
   }
 }

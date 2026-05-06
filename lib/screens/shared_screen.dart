@@ -28,14 +28,28 @@ class _SharedScreenState extends State<SharedScreen> {
   late NextcloudApi nextcloudApi;
   Map<SharedFile, CloudFile> mapFiles = {};
 
+  //late Future<List<SharedFile>?>? futureShared;
+
   @override
   void initState() {
     nextcloudApi = NextcloudApi(cuenta: widget.cuenta);
+    //futureShared = initShared();
     super.initState();
   }
 
   /*initFile(SharedFile shared) async {
     var fileShared = await nextcloudApi.getFile(shared.sharedPath);
+  }*/
+
+  /*Future<List<SharedFile>?>? initShared() async {
+    return await nextcloudApi.getShared();
+  }
+
+  Future<void> refreshData() async {
+    setState(() {
+      futureShared = initShared();
+    });
+    await futureShared;
   }*/
 
   void onTapShared(SharedFile shared) async {
@@ -139,6 +153,7 @@ class _SharedScreenState extends State<SharedScreen> {
     final fileId = await nextcloudApi.getFileId(pathFile);
     if (fileId == null) return null;
     fileShared.fileId = fileId;
+    //print(fileId);
     final preview = await nextcloudApi.fetchPreview(fileId);
     if (preview == null) return null;
     fileShared.preview = preview;
@@ -185,6 +200,7 @@ class _SharedScreenState extends State<SharedScreen> {
         //floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
         body: FutureBuilder<List<SharedFile>?>(
           future: nextcloudApi.getShared(),
+          //future: futureShared,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: const CircularProgressIndicator());
@@ -192,7 +208,8 @@ class _SharedScreenState extends State<SharedScreen> {
             if (snapshot.hasData) {
               final files = snapshot.data!;
               return SingleChildScrollView(
-                physics: ScrollPhysics(),
+                //physics: ScrollPhysics(),
+                physics: const AlwaysScrollableScrollPhysics(),
                 padding: .fromLTRB(20, 20, 20, 60),
                 child: ListView.separated(
                   physics: NeverScrollableScrollPhysics(),
@@ -254,6 +271,7 @@ class _SharedScreenState extends State<SharedScreen> {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
+                          //if (item.sharedId != null) Text(item.sharedId!),
                         ],
                       ),
                       trailing: Wrap(
@@ -272,6 +290,7 @@ class _SharedScreenState extends State<SharedScreen> {
                                       msg: 'Link copiado al portapapeles',
                                     );
                                   },
+                            tooltip: 'Copiar link al portapapeles',
                             icon: Icon(Icons.copy),
                           ),
                           IconButton(
@@ -292,7 +311,37 @@ class _SharedScreenState extends State<SharedScreen> {
                                       );
                                     }
                                   },
+                            tooltip: 'Abrir link en el navegador',
                             icon: Icon(Icons.open_in_new),
+                          ),
+                          IconButton(
+                            onPressed:
+                                item.sharedId == null ||
+                                    int.tryParse(item.sharedId!) == null
+                                ? null
+                                : () async {
+                                    var noCompartir = await nextcloudApi
+                                        .unshareFile(int.parse(item.sharedId!));
+                                    if (!context.mounted) return;
+                                    if (noCompartir == true) {
+                                      setState(() {});
+                                      //await nextcloudApi.getShared();
+                                      //if (!context.mounted) return;
+                                      SnackbarManager.show(
+                                        context: context,
+                                        msg:
+                                            'El archivo ha dejado de ser compartido',
+                                      );
+                                    } else {
+                                      SnackbarManager.show(
+                                        context: context,
+                                        msg: 'Error al dejar de compartir',
+                                        error: true,
+                                      );
+                                    }
+                                  },
+                            tooltip: 'Dejar de compartir',
+                            icon: Icon(Icons.link_off),
                           ),
                         ],
                       ),
@@ -302,6 +351,7 @@ class _SharedScreenState extends State<SharedScreen> {
               );
             }
             if (snapshot.hasError || !snapshot.hasData) {
+              //print(snapshot.error.toString());
               return Center(child: const Icon(Icons.error, size: 48));
             }
             return Center(child: const CircularProgressIndicator());

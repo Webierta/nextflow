@@ -34,8 +34,8 @@ extension _OnTapMore on _FilesScreenState {
                     },
                   ),
                   ListTile(
-                    leading: Icon(Icons.share),
-                    title: Text('Shared'),
+                    leading: Icon(Icons.link),
+                    title: Text('Share link'),
                     onTap: () {
                       Navigator.pop(contextBottomSheet);
                       sharedFile(item);
