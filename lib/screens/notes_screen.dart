@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:path/path.dart' as path_dart;
 
 import '../models/cloud_file.dart';
 import '../models/cuenta_nextcloud.dart';
@@ -8,6 +10,7 @@ import '../services/nextcloud_api/nextcloud_api.dart';
 import '../styles/styles_app.dart';
 import '../widgets/bottom_bar_app.dart';
 import '../widgets/cuenta_avatar.dart';
+import '../widgets/open_dialog.dart';
 import '../widgets/snackbar_manager.dart';
 import 'open_file_screen.dart';
 
@@ -37,6 +40,7 @@ class _NotesScreenState extends State<NotesScreen> {
   bool isGridView = false;
   Map<Note, CloudFile> mapFiles = {};
   int totalNotes = 0;
+  TextEditingController renameController = TextEditingController();
 
   @override
   void initState() {
@@ -44,6 +48,12 @@ class _NotesScreenState extends State<NotesScreen> {
     dropdownValue = categorias.first;
     initNotes();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    renameController.dispose();
+    super.dispose();
   }
 
   Future<void> initNotes() async {
@@ -88,11 +98,11 @@ class _NotesScreenState extends State<NotesScreen> {
     if (fileNote.typeFile != null &&
         fileNote.typeFile!.startsWith('text/plain') &&
         mounted) {
-      previewTxt(fileNote);
+      previewTxt(fileNote, cat: note.category);
     } else if (fileNote.typeFile != null &&
         fileNote.typeFile!.startsWith('text/markdown') &&
         mounted) {
-      previewMd(fileNote);
+      previewMd(fileNote, cat: note.category);
     } else {
       if (mounted) {
         SnackbarManager.show(
@@ -106,7 +116,7 @@ class _NotesScreenState extends State<NotesScreen> {
     }
   }
 
-  Future<void> previewTxt(CloudFile note) async {
+  Future<void> previewTxt(CloudFile note, {String? cat}) async {
     final pathFile = note.filePath(widget.cuenta.userName);
     if (pathFile == null) return;
     //final nextcloudApi = NextcloudApi(cuenta: widget.cuenta);
@@ -121,13 +131,14 @@ class _NotesScreenState extends State<NotesScreen> {
             cuenta: widget.cuenta,
             type: TypeOpenFile.txt,
             content: txt,
+            category: cat,
           ),
         ),
       );
     }
   }
 
-  Future<void> previewMd(CloudFile note) async {
+  Future<void> previewMd(CloudFile note, {String? cat}) async {
     final pathFile = note.filePath(widget.cuenta.userName);
     if (pathFile == null) return;
     //final nextcloudApi = NextcloudApi(cuenta: widget.cuenta);
@@ -141,6 +152,7 @@ class _NotesScreenState extends State<NotesScreen> {
             cuenta: widget.cuenta,
             type: TypeOpenFile.md,
             content: md,
+            category: cat,
           ),
         ),
       );

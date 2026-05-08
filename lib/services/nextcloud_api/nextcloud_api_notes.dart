@@ -28,4 +28,38 @@ extension Notes on NextcloudApi {
       return null;
     }
   }
+
+  Future<bool> updateNote({
+    required int id,
+    String? title,
+    String? content,
+    String? category,
+  }) async {
+    final data = <String, dynamic>{};
+    if (title != null) data['title'] = title;
+    if (content != null) data['content'] = content;
+    if (category != null) data['category'] = category;
+
+    final url = '${cuenta.server}/index.php/apps/notes/api/v1/notes';
+    Map<String, String> headers = {
+      'Authorization': 'Basic $auth}',
+      'OCS-APIRequest': 'true',
+      'Accept': 'application/json',
+    };
+
+    try {
+      final responseUpdate = await dio.put(
+        '$url/$id',
+        options: Options(headers: headers),
+        data: data,
+      );
+      if (responseUpdate.statusCode == 200) {
+        return true;
+      } else {
+        throw Exception('Error update Note: ${responseUpdate.statusCode}');
+      }
+    } on DioException catch (_) {
+      return false;
+    }
+  }
 }

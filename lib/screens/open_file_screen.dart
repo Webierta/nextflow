@@ -17,6 +17,7 @@ class OpenFileScreen extends StatelessWidget {
   final CuentaNextcloud cuenta;
   final dynamic content;
   final TypeOpenFile type;
+  final String? category;
 
   const OpenFileScreen({
     super.key,
@@ -24,6 +25,7 @@ class OpenFileScreen extends StatelessWidget {
     required this.cuenta,
     required this.content,
     required this.type,
+    this.category,
   });
 
   void showInfo(BuildContext context) {
@@ -47,6 +49,8 @@ class OpenFileScreen extends StatelessWidget {
                 Center(
                   child: Text(file.getName(), style: TextStyle(fontSize: 22)),
                 ),
+                if (category != null && category!.trim().isNotEmpty)
+                  ListTile(title: Text(category!), subtitle: Text('Category')),
                 if (detalles.isNotEmpty)
                   for (String key in detalles.keys)
                     ListTile(title: Text(detalles[key]!), subtitle: Text(key)),
