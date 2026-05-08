@@ -45,10 +45,7 @@ class OpenFileScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Center(
-                  child: Text(
-                    'Name: ${file.getName()}',
-                    style: TextStyle(fontSize: 22),
-                  ),
+                  child: Text(file.getName(), style: TextStyle(fontSize: 22)),
                 ),
                 if (detalles.isNotEmpty)
                   for (String key in detalles.keys)
@@ -149,7 +146,10 @@ class BodyTxt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(padding: .all(40), child: Text(content));
+    return SingleChildScrollView(
+      padding: .all(40),
+      child: SelectableText(content),
+    );
   }
 }
 

@@ -11,6 +11,8 @@ import '../widgets/cuenta_avatar.dart';
 import '../widgets/snackbar_manager.dart';
 import 'open_file_screen.dart';
 
+part 'notes_screen_on_tap_more.dart';
+
 class NotesScreen extends StatefulWidget {
   final CuentaNextcloud cuenta;
 
@@ -265,7 +267,10 @@ class _NotesScreenState extends State<NotesScreen> {
                                       size: 42,
                                     ),
                                     IconButton(
-                                      onPressed: () {},
+                                      onPressed: () => onTapMore(
+                                        context: context,
+                                        note: note,
+                                      ),
                                       icon: Icon(Icons.more_vert),
                                     ),
                                   ],
@@ -290,31 +295,42 @@ class _NotesScreenState extends State<NotesScreen> {
                       },
                     );
                   } else {
-                    return ListView.builder(
+                    return ListView.separated(
+                      shrinkWrap: true,
                       padding: .fromLTRB(20, 20, 20, 60),
                       itemCount: notes.length,
                       itemBuilder: (context, index) {
                         final note = notes[index];
-                        return Card(
-                          child: ListTile(
-                            onTap: () => onTapNote(note),
-                            titleAlignment: ListTileTitleAlignment.top,
-                            leading: Icon(
-                              Icons.star,
-                              color: note.favorite == true
-                                  ? Colors.yellow
-                                  : Colors.grey,
-                              size: 42,
-                            ),
-                            title: Text(note.title),
-                            subtitle: note.category != null
-                                ? Text(note.category!)
-                                : null,
-                            trailing: IconButton(
-                              onPressed: () {},
-                              icon: Icon(Icons.more_vert),
-                            ),
+                        return ListTile(
+                          onTap: () => onTapNote(note),
+                          titleAlignment: ListTileTitleAlignment.top,
+                          leading: Icon(
+                            Icons.star,
+                            color: note.favorite == true
+                                ? Colors.yellow
+                                : Colors.grey,
+                            size: 42,
                           ),
+                          title: Text(note.title),
+                          subtitle: note.category != null
+                              ? Text(note.category!)
+                              : null,
+                          trailing: IconButton(
+                            onPressed: () => onTapMore(
+                              context: context,
+                              note: note,
+                              //path: path,
+                            ),
+                            icon: Icon(Icons.more_vert),
+                          ),
+                        );
+                      },
+                      separatorBuilder: (context, index) {
+                        return Divider(
+                          color: Colors.white54,
+                          thickness: 0.2,
+                          indent: 20,
+                          endIndent: 20,
                         );
                       },
                     );
