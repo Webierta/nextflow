@@ -1,7 +1,7 @@
 name: nextflow
 description: "Nextcloud Open Client"
 publish_to: 'none'
-version: 0.2.8+11
+version: 0.3.0+12
 
 environment:
   sdk: ^3.10.8

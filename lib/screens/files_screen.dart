@@ -268,6 +268,31 @@ class _FilesScreenState extends State<FilesScreen> {
                   color: Colors.white,
                 ),
               ),
+              IconButton(
+                tooltip: 'Sort by name',
+                onPressed: () {
+                  setState(() {
+                    allFiles.sort(
+                      (a, b) =>
+                          a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+                    );
+                  });
+                },
+                icon: Icon(Icons.sort_by_alpha, size: 32, color: Colors.white),
+              ),
+              IconButton(
+                tooltip: 'Sort by date',
+                onPressed: () {
+                  setState(() {
+                    allFiles.sort((a, b) {
+                      final aDate = FormatDates.toDate(a.lastModified!);
+                      final bDate = FormatDates.toDate(b.lastModified!);
+                      return bDate.compareTo(aDate);
+                    });
+                  });
+                },
+                icon: Icon(Icons.date_range, size: 32, color: Colors.white),
+              ),
             ],
           ],
         ),

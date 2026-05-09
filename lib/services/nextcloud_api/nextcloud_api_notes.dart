@@ -15,6 +15,7 @@ extension Notes on NextcloudApi {
       );
       if (responseNotes.statusCode == 200) {
         var listData = responseNotes.data as List;
+        //print(listData);
         return listData.map((json) => Note.fromJson(json)).toList();
         /*if (category != null) {
           notes = notes.where((note) => note.category == category).toList();
@@ -34,11 +35,13 @@ extension Notes on NextcloudApi {
     String? title,
     String? content,
     String? category,
+    bool? favorite,
   }) async {
     final data = <String, dynamic>{};
     if (title != null) data['title'] = title;
     if (content != null) data['content'] = content;
     if (category != null) data['category'] = category;
+    if (favorite != null) data['favorite'] = favorite;
 
     final url = '${cuenta.server}/index.php/apps/notes/api/v1/notes';
     Map<String, String> headers = {

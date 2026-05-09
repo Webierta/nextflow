@@ -101,6 +101,16 @@ class _GalleryScreenState extends State<GalleryScreen> {
     }
   }
 
+  List<CloudFile> getSearchImages() {
+    return imagesPreview
+        .where(
+          (file) => file.name.toLowerCase().contains(
+            searchController.text.toLowerCase(),
+          ),
+        )
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (isLoading == false && imagesPreview.isEmpty) {
@@ -159,13 +169,18 @@ class _GalleryScreenState extends State<GalleryScreen> {
           //title: TitleAppbar(cuenta: widget.cuenta, title: 'Gallery'),
           actions: [
             if (searchController.text.isNotEmpty)
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    searchController.clear();
-                  });
-                },
-                icon: Icon(Icons.clear),
+              FittedBox(
+                child: InputChip(
+                  avatar: CircleAvatar(
+                    child: Text('${getSearchImages().length}'),
+                  ),
+                  label: Text(searchController.text),
+                  onDeleted: () {
+                    setState(() {
+                      searchController.clear();
+                    });
+                  },
+                ),
               ),
             IconButton(
               tooltip: 'Search image by name',
@@ -188,6 +203,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
               icon: Icon(Icons.search, size: 32, color: Colors.white),
             ),
             IconButton(
+              tooltip: 'Sort by name',
               onPressed: () {
                 setState(() {
                   imagesPreview.sort((a, b) => a.name.compareTo(b.name));
@@ -196,6 +212,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
               icon: Icon(Icons.sort_by_alpha, size: 32, color: Colors.white),
             ),
             IconButton(
+              tooltip: 'Sort by date',
               onPressed: () {
                 setState(() {
                   imagesPreview.sort((a, b) {
@@ -213,12 +230,24 @@ class _GalleryScreenState extends State<GalleryScreen> {
             preferredSize: Size.fromHeight(20),
             child: Align(
               alignment: Alignment.topLeft,
-              child: Padding(
+              /*child: Padding(
                 padding: const .only(left: 10, bottom: 6),
                 child: Text(
                   '${imagesPreview.length} images in ${widget.pathGallery}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                ),
+              ),*/
+              child: Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: Row(
+                  children: [
+                    Text(
+                      '${imagesPreview.length} images in ${widget.pathGallery}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -243,13 +272,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                       int columns = (constraints.maxWidth / 150).floor();
                       List<CloudFile> searchImages = imagesPreview;
                       if (searchController.text.isNotEmpty) {
-                        searchImages = imagesPreview
-                            .where(
-                              (file) => file.name.toLowerCase().contains(
-                                searchController.text.toLowerCase(),
-                              ),
-                            )
-                            .toList();
+                        searchImages = getSearchImages();
                       }
                       return GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

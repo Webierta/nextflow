@@ -10,6 +10,11 @@ class SharedFile extends OpenFile {
   final String? sharedLink;
 
   final String? sharedId;
+  final int time;
+
+  // "stime":1769207733,
+  // "path":"/Notes/Finanzas/Finanzas.md",
+  // "file_target":"/Finanzas.md",
 
   SharedFile({
     required this.sharedPath,
@@ -18,6 +23,7 @@ class SharedFile extends OpenFile {
     required this.itemSize,
     this.sharedLink,
     this.sharedId,
+    required this.time,
   });
 
   String get name {
@@ -38,6 +44,7 @@ class SharedFile extends OpenFile {
       itemSize: jsonData['item_size'],
       sharedLink: jsonData['url'] ?? jsonData['share_with_link'],
       sharedId: jsonData['id'] ?? 0,
+      time: jsonData['stime'],
     );
   }
 

@@ -60,6 +60,9 @@ class _NotesScreenState extends State<NotesScreen> {
     setState(() => isLoading = true);
     final myNotes = await nextcloudApi.getNotes();
     if (myNotes == null) return;
+    myNotes.sort(
+      (a, b) => a.getName().toLowerCase().compareTo(b.getName().toLowerCase()),
+    );
 
     List<String> countCategorias = [];
     for (var note in myNotes) {
@@ -159,6 +162,26 @@ class _NotesScreenState extends State<NotesScreen> {
     }
   }
 
+  Future<void> changeFavorite(Note note, bool isFavorite) async {
+    final update = await nextcloudApi.updateNote(
+      id: note.id,
+      favorite: isFavorite,
+    );
+    if (update == true && mounted) {
+      initNotes();
+      SnackbarManager.show(
+        context: context,
+        msg: 'Favorite changed successfully!',
+      );
+    } else if (update == false && mounted) {
+      SnackbarManager.show(
+        context: context,
+        msg: 'Failed to changed favorite',
+        error: true,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (category != null) {
@@ -189,6 +212,33 @@ class _NotesScreenState extends State<NotesScreen> {
           ),
           title: Text('Notes: ${notes.length}'),
           actions: [
+            IconButton(
+              tooltip: 'Sort by name',
+              onPressed: () {
+                setState(() {
+                  notes.sort(
+                    (a, b) => a.getName().toLowerCase().compareTo(
+                      b.getName().toLowerCase(),
+                    ),
+                  );
+                });
+              },
+              icon: Icon(Icons.sort_by_alpha, size: 32, color: Colors.white),
+            ),
+            IconButton(
+              tooltip: 'Sort by date',
+              onPressed: () {
+                setState(() {
+                  notes.sort((a, b) {
+                    //final aDate = FormatDates.toDate(a.lastModified!);
+                    //final bDate = FormatDates.toDate(b.lastModified!);
+                    //return bDate.compareTo(aDate);
+                    return b.modified.compareTo(a.modified);
+                  });
+                });
+              },
+              icon: Icon(Icons.date_range, size: 32, color: Colors.white),
+            ),
             IconButton(
               onPressed: () {
                 setState(() => isGridView = !isGridView);
@@ -271,12 +321,24 @@ class _NotesScreenState extends State<NotesScreen> {
                                 Row(
                                   mainAxisAlignment: .spaceBetween,
                                   children: [
-                                    Icon(
+                                    /*Icon(
                                       Icons.star,
                                       color: note.favorite == true
                                           ? Colors.yellow
                                           : Colors.grey,
                                       size: 42,
+                                    ),*/
+                                    IconButton(
+                                      onPressed: () {
+                                        changeFavorite(note, !note.favorite);
+                                      },
+                                      icon: Icon(
+                                        Icons.star,
+                                        color: note.favorite == true
+                                            ? Colors.yellow
+                                            : Colors.grey,
+                                        size: 42,
+                                      ),
                                     ),
                                     IconButton(
                                       onPressed: () => onTapMore(
@@ -292,13 +354,26 @@ class _NotesScreenState extends State<NotesScreen> {
                                 Spacer(flex: 2),
                                 if (note.category != null &&
                                     note.category != '')
-                                  FittedBox(
+                                  Container(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.tertiaryContainer,
+                                    width: double.infinity,
+                                    padding: EdgeInsets.symmetric(vertical: 6),
+                                    child: Text(
+                                      note.category!,
+                                      textAlign: TextAlign.center,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.fade,
+                                    ),
+                                  ),
+                                /*FittedBox(
                                     child: Chip(
                                       avatar: Icon(Icons.category),
                                       label: Text(note.category!),
                                       side: BorderSide.none,
                                     ),
-                                  ),
+                                  ),*/
                                 //Text(note.category!),
                               ],
                             ),
@@ -316,12 +391,24 @@ class _NotesScreenState extends State<NotesScreen> {
                         return ListTile(
                           onTap: () => onTapNote(note),
                           titleAlignment: ListTileTitleAlignment.top,
-                          leading: Icon(
+                          /*leading: Icon(
                             Icons.star,
                             color: note.favorite == true
                                 ? Colors.yellow
                                 : Colors.grey,
                             size: 42,
+                          ),*/
+                          leading: IconButton(
+                            onPressed: () {
+                              changeFavorite(note, !note.favorite);
+                            },
+                            icon: Icon(
+                              Icons.star,
+                              color: note.favorite == true
+                                  ? Colors.yellow
+                                  : Colors.grey,
+                              size: 42,
+                            ),
                           ),
                           title: Text(note.title),
                           subtitle: note.category != null
@@ -359,11 +446,11 @@ class _NotesScreenState extends State<NotesScreen> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 10.0),
+          //padding: EdgeInsets.symmetric(horizontal: 10.0),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10.0),
             border: Border.all(
-              //color: Colors.red,
+              color: Colors.white30,
               style: BorderStyle.solid,
               width: 0.80,
             ),
@@ -373,7 +460,10 @@ class _NotesScreenState extends State<NotesScreen> {
               isExpanded: true,
               value: dropdownValue,
               //icon: const Icon(Icons.arrow_downward),
-              icon: Icon(Icons.filter_alt_outlined, size: 32),
+              icon: Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: Icon(Icons.filter_alt_outlined, size: 32),
+              ),
               elevation: 16,
               //style: const TextStyle(color: Colors.blueAccent),
               //underline: Container(height: 2, color: Colors.blueAccent),
@@ -393,6 +483,7 @@ class _NotesScreenState extends State<NotesScreen> {
                       child: FittedBox(
                         child: Row(
                           children: [
+                            const SizedBox(width: 10),
                             CircleAvatar(
                               child: Text(
                                 value.isEmpty

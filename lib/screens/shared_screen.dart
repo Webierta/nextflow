@@ -30,13 +30,23 @@ class _SharedScreenState extends State<SharedScreen> {
   late NextcloudApi nextcloudApi;
   Map<SharedFile, CloudFile> mapFiles = {};
 
+  bool isLoading = false;
+  List<SharedFile> allShared = [];
+
   //late Future<List<SharedFile>?>? futureShared;
 
   @override
   void initState() {
     nextcloudApi = NextcloudApi(cuenta: widget.cuenta);
     //futureShared = initShared();
+    initShared();
     super.initState();
+  }
+
+  Future<void> initShared() async {
+    setState(() => isLoading = true);
+    allShared = await nextcloudApi.getShared() ?? [];
+    setState(() => isLoading = false);
   }
 
   /*initFile(SharedFile shared) async {
@@ -183,6 +193,34 @@ class _SharedScreenState extends State<SharedScreen> {
           ),
           title: Text('Shared files'),
           //title: TitleAppbar(cuenta: widget.cuenta, title: 'Shared Files'),
+          actions: [
+            IconButton(
+              tooltip: 'Sort by name',
+              onPressed: () {
+                setState(() {
+                  allShared.sort(
+                    (a, b) =>
+                        a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+                  );
+                });
+              },
+              icon: Icon(Icons.sort_by_alpha, size: 32, color: Colors.white),
+            ),
+            IconButton(
+              tooltip: 'Sort by date',
+              onPressed: () {
+                setState(() {
+                  allShared.sort((a, b) {
+                    //final aDate = FormatDates.toDate(a.lastModified!);
+                    //final bDate = FormatDates.toDate(b.lastModified!);
+                    //return bDate.compareTo(aDate);
+                    return b.time.compareTo(a.time);
+                  });
+                });
+              },
+              icon: Icon(Icons.date_range, size: 32, color: Colors.white),
+            ),
+          ],
         ),
         /*floatingActionButton: FloatingActionButton(
           onPressed: () {},
@@ -200,7 +238,104 @@ class _SharedScreenState extends State<SharedScreen> {
           //funcion: null,
         ),
         //floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-        body: FutureBuilder<List<SharedFile>?>(
+        body: (isLoading == true)
+            ? Center(
+                child: Transform.scale(
+                  scale: 3,
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            : LayoutBuilder(
+                builder: (context, constraints) {
+                  if (allShared.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: .center,
+                        children: [
+                          Icon(Icons.not_interested_rounded, size: 84),
+                          const SizedBox(height: 42),
+                          Text('No se han encontrado archivos compartidos'),
+                        ],
+                      ),
+                    );
+                  }
+                  return SingleChildScrollView(
+                    physics: ScrollPhysics(),
+                    padding: .fromLTRB(20, 20, 20, 60),
+                    child: ListView.separated(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: allShared.length,
+                      separatorBuilder: (context, index) {
+                        return Divider(
+                          color: Colors.white54,
+                          thickness: 0.2,
+                          indent: 20,
+                          endIndent: 20,
+                        );
+                      },
+                      itemBuilder: (context, index) {
+                        var item = allShared[index];
+                        getPreviewShared(item);
+                        return ListTile(
+                          onTap: () => onTapShared(item),
+                          titleAlignment: ListTileTitleAlignment.top,
+                          leading: (item.mimeType.startsWith('image/'))
+                              ? FutureBuilder(
+                                  future: getPreviewShared(item),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      return Image.memory(
+                                        snapshot.data!,
+                                        height: 48,
+                                        width: 48,
+                                        fit: BoxFit.fill,
+                                      );
+                                    }
+                                    return Icon(Icons.image, size: 42);
+                                  },
+                                )
+                              : TypeIcon(
+                                  isDirectory: item.itemType == 'folder',
+                                  fileType: item.mimeType,
+                                ),
+                          title: Text(
+                            item.name,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: .start,
+                            children: [
+                              Text(
+                                'in ${item.path == '/' ? 'Home' : item.path}',
+                              ),
+                              FittedBox(
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      FormatBytes.show(item.itemSize),
+                                      maxLines: 2,
+                                    ),
+                                    Text(' - '),
+                                    Text(item.mimeType),
+                                  ],
+                                ),
+                              ),
+                              //if (item.sharedId != null) Text(item.sharedId!),
+                            ],
+                          ),
+                          trailing: IconButton(
+                            onPressed: () =>
+                                onTapMore(context: context, item: item),
+                            icon: Icon(Icons.more_vert),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+        /*body: FutureBuilder<List<SharedFile>?>(
           future: nextcloudApi.getShared(),
           //future: futureShared,
           builder: (context, snapshot) {
@@ -270,12 +405,6 @@ class _SharedScreenState extends State<SharedScreen> {
                               ],
                             ),
                           ),
-                          /*if (item.sharedLink != null)
-                            Text(
-                              item.sharedLink!,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),*/
                           //if (item.sharedId != null) Text(item.sharedId!),
                         ],
                       ),
@@ -284,86 +413,17 @@ class _SharedScreenState extends State<SharedScreen> {
                             onTapMore(context: context, item: item),
                         icon: Icon(Icons.more_vert),
                       ),
-                      /*trailing: Wrap(
-                        children: [
-                          IconButton(
-                            onPressed: item.sharedLink == null
-                                ? null
-                                : () async {
-                                    await Clipboard.setData(
-                                      ClipboardData(text: item.sharedLink!),
-                                    );
-                                    if (!context.mounted) return;
-                                    SnackbarManager.show(
-                                      context: context,
-                                      msg: 'Link copiado al portapapeles',
-                                    );
-                                  },
-                            tooltip: 'Copiar link al portapapeles',
-                            icon: Icon(Icons.copy),
-                          ),
-                          IconButton(
-                            onPressed: item.sharedLink == null
-                                ? null
-                                : () async {
-                                    if (!await launchUrl(
-                                      Uri.parse(item.sharedLink!),
-                                      mode: LaunchMode.externalApplication,
-                                    )) {
-                                      //throw Exception('Could not launch ${item.sharedLink}',);
-                                      if (!context.mounted) return;
-                                      SnackbarManager.show(
-                                        context: context,
-                                        msg:
-                                            'Could not launch ${item.sharedLink}',
-                                        error: true,
-                                      );
-                                    }
-                                  },
-                            tooltip: 'Abrir link en el navegador',
-                            icon: Icon(Icons.open_in_new),
-                          ),
-                          IconButton(
-                            onPressed:
-                                item.sharedId == null ||
-                                    int.tryParse(item.sharedId!) == null
-                                ? null
-                                : () async {
-                                    var noCompartir = await nextcloudApi
-                                        .unshareFile(int.parse(item.sharedId!));
-                                    if (!context.mounted) return;
-                                    if (noCompartir == true) {
-                                      setState(() {});
-                                      SnackbarManager.show(
-                                        context: context,
-                                        msg:
-                                            'El archivo ha dejado de ser compartido',
-                                      );
-                                    } else {
-                                      SnackbarManager.show(
-                                        context: context,
-                                        msg: 'Error al dejar de compartir',
-                                        error: true,
-                                      );
-                                    }
-                                  },
-                            tooltip: 'Dejar de compartir',
-                            icon: Icon(Icons.link_off),
-                          ),
-                        ],
-                      ),*/
                     );
                   },
                 ),
               );
             }
             if (snapshot.hasError || !snapshot.hasData) {
-              //print(snapshot.error.toString());
               return Center(child: const Icon(Icons.error, size: 48));
             }
             return Center(child: const CircularProgressIndicator());
           },
-        ),
+        ),*/
       ),
     );
   }

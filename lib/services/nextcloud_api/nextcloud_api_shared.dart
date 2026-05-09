@@ -15,6 +15,7 @@ extension Shared on NextcloudApi {
       );
       if (response.statusCode == 200) {
         var listData = response.data['ocs']['data'] as List;
+        //print(listData);
         List<SharedFile> sharedFiles = listData
             .map((item) => SharedFile.fromJson(item))
             .toList();
