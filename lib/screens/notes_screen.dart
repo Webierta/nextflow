@@ -101,11 +101,11 @@ class _NotesScreenState extends State<NotesScreen> {
     if (fileNote.typeFile != null &&
         fileNote.typeFile!.startsWith('text/plain') &&
         mounted) {
-      previewTxt(fileNote, cat: note.category);
+      previewTxt(fileNote, note.id, cat: note.category);
     } else if (fileNote.typeFile != null &&
         fileNote.typeFile!.startsWith('text/markdown') &&
         mounted) {
-      previewMd(fileNote, cat: note.category);
+      previewMd(fileNote, note.id, cat: note.category);
     } else {
       if (mounted) {
         SnackbarManager.show(
@@ -119,7 +119,7 @@ class _NotesScreenState extends State<NotesScreen> {
     }
   }
 
-  Future<void> previewTxt(CloudFile note, {String? cat}) async {
+  Future<void> previewTxt(CloudFile note, int id, {String? cat}) async {
     final pathFile = note.filePath(widget.cuenta.userName);
     if (pathFile == null) return;
     //final nextcloudApi = NextcloudApi(cuenta: widget.cuenta);
@@ -135,13 +135,14 @@ class _NotesScreenState extends State<NotesScreen> {
             type: TypeOpenFile.txt,
             content: txt,
             category: cat,
+            noteId: id,
           ),
         ),
       );
     }
   }
 
-  Future<void> previewMd(CloudFile note, {String? cat}) async {
+  Future<void> previewMd(CloudFile note, int id, {String? cat}) async {
     final pathFile = note.filePath(widget.cuenta.userName);
     if (pathFile == null) return;
     //final nextcloudApi = NextcloudApi(cuenta: widget.cuenta);
@@ -156,6 +157,7 @@ class _NotesScreenState extends State<NotesScreen> {
             type: TypeOpenFile.md,
             content: md,
             category: cat,
+            noteId: id,
           ),
         ),
       );

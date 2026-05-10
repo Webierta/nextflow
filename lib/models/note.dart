@@ -41,6 +41,9 @@ class Note extends OpenFile {
     );
   }
 
+  // @override
+  // ObjectOpenFile getType() => ObjectOpenFile.note;
+
   @override
   String getName() => title;
 

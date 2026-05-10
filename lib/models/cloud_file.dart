@@ -28,6 +28,9 @@ class CloudFile extends OpenFile {
     this.preview,
   });
 
+  // @override
+  // ObjectOpenFile getType() => ObjectOpenFile.cloudfile;
+
   String pathFile(String currentPath) {
     return '${currentPath.substring(1)}/$name';
     //return '$currentPath/$name';

@@ -63,5 +63,5 @@ class NextcloudApi {
     }
   }
 
-  void deconectar() => dio.close();
+  void desconectar() => dio.close();
 }

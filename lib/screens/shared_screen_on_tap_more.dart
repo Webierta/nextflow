@@ -103,11 +103,12 @@ extension _OnTapMore on _SharedScreenState {
                             );
                             if (!context.mounted) return;
                             if (noCompartir == true) {
-                              setState(() {});
+                              //setState(() {});
                               SnackbarManager.show(
                                 context: context,
                                 msg: 'El archivo ha dejado de ser compartido',
                               );
+                              initShared();
                             } else {
                               SnackbarManager.show(
                                 context: context,

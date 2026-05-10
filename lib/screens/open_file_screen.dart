@@ -12,12 +12,13 @@ import '../widgets/snackbar_manager.dart';
 
 enum TypeOpenFile { txt, pdf, md, image }
 
-class OpenFileScreen extends StatelessWidget {
+class OpenFileScreen extends StatefulWidget {
   final OpenFile file;
   final CuentaNextcloud cuenta;
   final dynamic content;
   final TypeOpenFile type;
   final String? category;
+  final int? noteId;
 
   const OpenFileScreen({
     super.key,
@@ -26,7 +27,29 @@ class OpenFileScreen extends StatelessWidget {
     required this.content,
     required this.type,
     this.category,
+    this.noteId,
   });
+
+  @override
+  State<OpenFileScreen> createState() => _OpenFileScreenState();
+}
+
+class _OpenFileScreenState extends State<OpenFileScreen> {
+  TextEditingController controllerNote = TextEditingController();
+
+  bool editMd = false;
+
+  @override
+  void initState() {
+    controllerNote.text = widget.content;
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    controllerNote.dispose();
+    super.dispose();
+  }
 
   void showInfo(BuildContext context) {
     showModalBottomSheet<void>(
@@ -34,7 +57,9 @@ class OpenFileScreen extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
       context: context,
       builder: (BuildContext context) {
-        final Map<String, String> detalles = file.showInfo(cuenta.userName);
+        final Map<String, String> detalles = widget.file.showInfo(
+          widget.cuenta.userName,
+        );
         return Container(
           padding: const EdgeInsets.all(20),
           //height: 200,
@@ -47,10 +72,17 @@ class OpenFileScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Center(
-                  child: Text(file.getName(), style: TextStyle(fontSize: 22)),
+                  child: Text(
+                    widget.file.getName(),
+                    style: TextStyle(fontSize: 22),
+                  ),
                 ),
-                if (category != null && category!.trim().isNotEmpty)
-                  ListTile(title: Text(category!), subtitle: Text('Category')),
+                if (widget.category != null &&
+                    widget.category!.trim().isNotEmpty)
+                  ListTile(
+                    title: Text(widget.category!),
+                    subtitle: Text('Category'),
+                  ),
                 if (detalles.isNotEmpty)
                   for (String key in detalles.keys)
                     ListTile(title: Text(detalles[key]!), subtitle: Text(key)),
@@ -80,14 +112,41 @@ class OpenFileScreen extends StatelessWidget {
     }
   }
 
+  StatelessWidget buildBody() {
+    if (editMd == true) {
+      return BodyTxt(
+        content: widget.content,
+        controller: controllerNote,
+        noteId: widget.noteId,
+      );
+    }
+
+    return switch (widget.type) {
+      TypeOpenFile.txt => BodyTxt(
+        content: widget.content,
+        controller: controllerNote,
+        noteId: widget.noteId,
+        //controller: widget.noteId != null ? controllerNote : null,
+      ),
+      TypeOpenFile.pdf => BodyPdf(content: widget.content),
+      TypeOpenFile.md => BodyMd(content: widget.content),
+      TypeOpenFile.image => BodyImage(content: widget.content),
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
-    Widget body = switch (type) {
-      TypeOpenFile.txt => BodyTxt(content: content),
-      TypeOpenFile.pdf => BodyPdf(content: content),
-      TypeOpenFile.md => BodyMd(content: content),
-      TypeOpenFile.image => BodyImage(content: content),
-    };
+    /*Widget body = switch (widget.type) {
+      TypeOpenFile.txt => BodyTxt(
+        content: widget.content,
+        controller: controllerNote,
+        noteId: widget.noteId,
+        //controller: widget.noteId != null ? controllerNote : null,
+      ),
+      TypeOpenFile.pdf => BodyPdf(content: widget.content),
+      TypeOpenFile.md => BodyMd(content: widget.content),
+      TypeOpenFile.image => BodyImage(content: widget.content),
+    };*/
 
     return Container(
       decoration: BoxDecoration(
@@ -96,24 +155,55 @@ class OpenFileScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          /*leading: IconButton(
-            onPressed: () {
-              if (context.mounted) {
-                Navigator.pop(context);
-                */
-          /*Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (context) => FilesScreen(cuenta: cuenta),
-                  ),
-                );*/
-          /*
-              }
-            },
-            icon: Icon(Icons.arrow_back),
-          ),*/
-          title: Text(file.getName()),
+          title: Text(widget.file.getName()),
+          actions: [
+            if ((widget.noteId != null && widget.type == TypeOpenFile.txt) ||
+                editMd == true)
+              IconButton(
+                onPressed: () async {
+                  final nextcloudApi = NextcloudApi(cuenta: widget.cuenta);
+                  bool updateNote = await nextcloudApi.updateNote(
+                    id: widget.noteId!,
+                    content: controllerNote.text,
+                  );
+                  if (!context.mounted) return;
+                  Navigator.of(context).pop();
+                  if (updateNote == true) {
+                    //initNotes();
+                    SnackbarManager.show(
+                      context: context,
+                      msg: 'Note changed successfully!',
+                    );
+                  } else if (updateNote == false) {
+                    SnackbarManager.show(
+                      context: context,
+                      msg: 'Failed to update note',
+                      error: true,
+                    );
+                  }
+                },
+                icon: Icon(Icons.save, color: Colors.white),
+              ),
+            if (widget.noteId != null &&
+                widget.type == TypeOpenFile.md &&
+                editMd == false)
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    editMd = true;
+                    /*body = BodyTxt(
+                      content: widget.content,
+                      controller: controllerNote,
+                      noteId: widget.noteId,
+                    );*/
+                  });
+                },
+                icon: Icon(Icons.edit, color: Colors.white),
+              ),
+          ],
         ),
-        body: body,
+        //body: body,
+        body: buildBody(),
         bottomNavigationBar: BottomAppBar(
           height: 45,
           color: Theme.of(context).colorScheme.onPrimary,
@@ -125,8 +215,11 @@ class OpenFileScreen extends StatelessWidget {
                 icon: const Icon(Icons.info),
               ),
               IconButton(
-                onPressed: () =>
-                    downloadFile(context: context, cuenta: cuenta, file: file),
+                onPressed: () => downloadFile(
+                  context: context,
+                  cuenta: widget.cuenta,
+                  file: widget.file,
+                ),
                 icon: Icon(Icons.download),
               ),
               IconButton(
@@ -145,14 +238,32 @@ class OpenFileScreen extends StatelessWidget {
 
 class BodyTxt extends StatelessWidget {
   final String content;
+  final TextEditingController? controller;
+  final int? noteId;
 
-  const BodyTxt({super.key, required this.content});
+  const BodyTxt({
+    super.key,
+    required this.content,
+    this.controller,
+    this.noteId,
+  });
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       padding: .all(40),
-      child: SelectableText(content),
+      //child: SelectableText(content),
+      //child: NoteEdit(content: content),
+      child: TextField(
+        controller: controller,
+        //enabled: noteId != null,
+        readOnly: noteId == null,
+        maxLines: null,
+        decoration: InputDecoration.collapsed(
+          hintText: '',
+          border: InputBorder.none,
+        ),
+      ),
     );
   }
 }
@@ -165,6 +276,7 @@ class BodyMd extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MarkdownWidget(
+      //data: content,
       data: content,
       padding: .all(40),
       config: MarkdownConfig(

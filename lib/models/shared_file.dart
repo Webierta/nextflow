@@ -26,6 +26,9 @@ class SharedFile extends OpenFile {
     required this.time,
   });
 
+  // @override
+  // ObjectOpenFile getType() => ObjectOpenFile.shared;
+
   String get name {
     //var lastSeparator = sharedPath.lastIndexOf('/');
     //return sharedPath.substring(lastSeparator + 1);

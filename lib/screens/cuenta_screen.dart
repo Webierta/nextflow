@@ -128,7 +128,7 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
   void desconectarCuenta() {
     if (cuentaSelect == null) return;
     var nextcloudApi = NextcloudApi(cuenta: cuentaSelect!);
-    nextcloudApi.deconectar();
+    nextcloudApi.desconectar();
     ref.read(cuentasProvider.notifier).desconectar(cuentaSelect!);
     setState(() {
       cuentaSelect = cuentaSelect!.copyWith(statusAuth: StatusAuth.logout);
