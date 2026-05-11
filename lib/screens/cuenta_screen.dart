@@ -52,35 +52,60 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
       builder: (context) {
         return AlertDialog(
           title: Text('Conecta la nube'),
-          content: Column(
-            mainAxisSize: .min,
-            children: [
-              DropdownButtonHideUnderline(
-                child: DropdownButton<CuentaNextcloud>(
-                  hint: cuentaSelect == null
-                      ? Text('Selecciona una cuenta')
-                      : RowAvatar(cuenta: cuentaSelect!),
-                  //value: cuentaSelect,
-                  //elevation: 16,
-                  onChanged: (CuentaNextcloud? cuenta) async {
-                    Navigator.of(context).pop();
-                    if (cuenta != null) {
-                      setState(() => cuentaSelect = cuenta);
-                      await conectarCuenta();
-                    }
-                  },
-                  items: cuentas
-                      .map<DropdownMenuItem<CuentaNextcloud>>(
-                        (CuentaNextcloud cuenta) =>
-                            DropdownMenuItem<CuentaNextcloud>(
-                              value: cuenta,
-                              child: RowAvatar(cuenta: cuenta),
-                            ),
-                      )
-                      .toList(),
+          content: SizedBox(
+            //width: MediaQuery.of(context).size.width * 0.9,
+            child: Column(
+              mainAxisSize: .min,
+              children: [
+                FittedBox(
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<CuentaNextcloud>(
+                      padding: .all(0),
+                      hint: cuentaSelect == null
+                          ? Text('Selecciona una cuenta')
+                          : RowAvatar(cuenta: cuentaSelect!),
+                      onChanged: (CuentaNextcloud? cuenta) async {
+                        Navigator.of(context).pop();
+                        if (cuenta != null) {
+                          setState(() => cuentaSelect = cuenta);
+                          await conectarCuenta();
+                        }
+                      },
+                      items: cuentas
+                          .map<DropdownMenuItem<CuentaNextcloud>>(
+                            (CuentaNextcloud cuenta) =>
+                                DropdownMenuItem<CuentaNextcloud>(
+                                  value: cuenta,
+                                  /*child: FittedBox(
+                                      child: RowAvatar(cuenta: cuenta),
+                                    ),*/
+                                  child: Text(
+                                    cuenta.name,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.visible,
+                                  ),
+                                  /*child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Chip(
+                                      side: BorderSide(
+                                        color: Colors.transparent,
+                                      ),
+                                      avatar: CuentaAvatar(
+                                        cuenta: cuenta,
+                                        size: 30,
+                                        onlyAvatar: true,
+                                      ),
+                                      label: Text(cuenta.name),
+                                    ),
+                                  ),*/
+                                ),
+                          )
+                          .toList(),
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -367,10 +392,16 @@ class RowAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: .min,
       children: [
         CuentaAvatar(cuenta: cuenta, size: 30, onlyAvatar: true),
         const SizedBox(width: 20),
-        Text(cuenta.name, style: TextStyle(fontSize: 18)),
+        Text(
+          cuenta.name,
+          style: TextStyle(fontSize: 18),
+          maxLines: 1,
+          overflow: TextOverflow.fade,
+        ),
       ],
     );
   }

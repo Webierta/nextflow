@@ -56,9 +56,9 @@ class BottomBarApp extends StatelessWidget {
           if (funcion != null && depth == '1')
             IconButton.filled(
               onPressed: funcion,
-              icon: Icon(Icons.upload),
+              icon: Icon(destino == Destino.notes ? Icons.add : Icons.upload),
               //iconSize: 32,
-              tooltip: 'Upload file',
+              tooltip: destino == Destino.notes ? 'Add note' : 'Upload file',
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),

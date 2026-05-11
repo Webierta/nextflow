@@ -363,7 +363,7 @@ class _FilesScreenState extends State<FilesScreen> {
                   }
                   return SingleChildScrollView(
                     physics: ScrollPhysics(),
-                    padding: .fromLTRB(20, 20, 20, 60),
+                    padding: .fromLTRB(10, 10, 10, 60),
                     child: ListView.separated(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,

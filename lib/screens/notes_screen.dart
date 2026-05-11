@@ -184,6 +184,36 @@ class _NotesScreenState extends State<NotesScreen> {
     }
   }
 
+  Future<void> newNote() async {
+    var noteName = await OpenDialog.inputName(
+      context: context,
+      title: 'Input note name',
+      icon: Icons.note_add,
+      controller: renameController,
+    );
+    if (noteName == null) return;
+    renameController.clear();
+
+    (bool, Note?) response = await nextcloudApi.addNote(noteName);
+    if (response.$1 == true && response.$2 != null) {
+      if (mounted) {
+        SnackbarManager.show(context: context, msg: 'Add note successfully!');
+      }
+      initNotes();
+      if (response.$2 is Note) {
+        onTapNote(response.$2!);
+      }
+    } else {
+      if (mounted) {
+        SnackbarManager.show(
+          context: context,
+          msg: 'Add note failed',
+          error: true,
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (category != null) {
@@ -295,7 +325,7 @@ class _NotesScreenState extends State<NotesScreen> {
         bottomNavigationBar: BottomBarApp(
           cuenta: widget.cuenta,
           destino: Destino.notes,
-          funcion: null,
+          funcion: newNote,
         ),
         body: isLoading
             ? Center(child: CircularProgressIndicator())
@@ -311,7 +341,7 @@ class _NotesScreenState extends State<NotesScreen> {
                         crossAxisSpacing: 4, // Space between columns
                         mainAxisSpacing: 4, // Space between rows
                       ),
-                      padding: .all(20),
+                      padding: .all(10),
                       itemCount: notes.length,
                       itemBuilder: (context, index) {
                         var note = notes[index];
@@ -386,7 +416,7 @@ class _NotesScreenState extends State<NotesScreen> {
                   } else {
                     return ListView.separated(
                       shrinkWrap: true,
-                      padding: .fromLTRB(20, 20, 20, 60),
+                      padding: .fromLTRB(10, 10, 10, 60),
                       itemCount: notes.length,
                       itemBuilder: (context, index) {
                         final note = notes[index];

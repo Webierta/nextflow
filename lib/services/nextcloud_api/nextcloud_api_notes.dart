@@ -30,6 +30,31 @@ extension Notes on NextcloudApi {
     }
   }
 
+  Future<(bool, Note?)> addNote(String titleNote) async {
+    final url = '${cuenta.server}/index.php/apps/notes/api/v1/notes';
+    Map<String, String> headers = {
+      'Authorization': 'Basic $auth}',
+      'OCS-APIRequest': 'true',
+      'Accept': 'application/json',
+    };
+
+    try {
+      final response = await dio.post(
+        url,
+        options: Options(headers: headers),
+        data: {'title': titleNote, 'content': '# Hola\n\nCreada con Nextflow'},
+      );
+      if (response.statusCode == 200) {
+        Note note = Note.fromJson(response.data);
+        return (true, note);
+      } else {
+        throw Exception('Error new Note: ${response.statusCode}');
+      }
+    } on DioException catch (_) {
+      return (false, null);
+    }
+  }
+
   Future<bool> updateNote({
     required int id,
     String? title,

@@ -41,7 +41,9 @@ class _OpenFileScreenState extends State<OpenFileScreen> {
 
   @override
   void initState() {
-    controllerNote.text = widget.content;
+    if (widget.content is String) {
+      controllerNote.text = widget.content;
+    }
     super.initState();
   }
 
@@ -120,7 +122,6 @@ class _OpenFileScreenState extends State<OpenFileScreen> {
         noteId: widget.noteId,
       );
     }
-
     return switch (widget.type) {
       TypeOpenFile.txt => BodyTxt(
         content: widget.content,
