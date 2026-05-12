@@ -19,6 +19,7 @@ extension MoveDelete on NextcloudApi {
             'Overwrite': 'T',
           },
         ),
+        cancelToken: cancelToken,
       );
       if (response.statusCode == 201 || response.statusCode == 204) {
         return true;
@@ -37,6 +38,7 @@ extension MoveDelete on NextcloudApi {
       final response = await dio.delete(
         url,
         options: Options(headers: {'Authorization': 'Basic $auth}'}),
+        cancelToken: cancelToken,
       );
       return response.statusCode == 204 || response.statusCode == 200;
     } on DioException catch (_) {

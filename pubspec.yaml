@@ -1,21 +1,22 @@
 name: nextflow
 description: "Nextcloud Open Client"
 publish_to: 'none'
-version: 0.4.0+14
+version: 0.5.0+15
 
 environment:
   sdk: ^3.10.8
 
 dependencies:
   dio: ^5.9.0
-  file_picker: ^11.0.2
+  dio_cache_interceptor: ^4.0.6
+  file_picker: ^12.0.0-beta.2
   flutter:
     sdk: flutter
   flutter_riverpod: ^3.2.0
   flutter_secure_storage: ^10.0.0
   intl: ^0.20.2
   markdown_widget: ^2.3.2+8
-  package_info_plus: ^9.0.0
+  package_info_plus: ^10.1.0
   path: ^1.9.1
   path_provider: ^2.1.5
   printing: ^5.14.2

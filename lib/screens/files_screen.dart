@@ -42,6 +42,9 @@ class FilesScreen extends StatefulWidget {
 
 class _FilesScreenState extends State<FilesScreen> {
   late NextcloudApi nextcloudApi;
+
+  //final CancelToken cancelToken = CancelToken();
+
   String currentPath = '/';
   List<String> paths = [];
   bool isLoading = false;
@@ -79,11 +82,14 @@ class _FilesScreenState extends State<FilesScreen> {
       }
     });
     allFiles = await nextcloudApi.getFiles(currentPath, depth: depth) ?? [];
+    //allFiles = await nextcloudApi.listFiles(currentPath, depth: depth) ?? [];
     setState(() => isLoading = false);
   }
 
   @override
   void dispose() {
+    //cancelToken.cancel();
+    nextcloudApi.cancelToken.cancel();
     renameController.dispose();
     folderController.dispose();
     searchController.dispose();
@@ -313,6 +319,7 @@ class _FilesScreenState extends State<FilesScreen> {
           destino: Destino.files,
           funcion: uploadFile,
           depth: depth,
+          //cancelToken: nextcloudApi.cancelToken,
         ),
         //floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
         body: (isLoading == true)
@@ -363,7 +370,7 @@ class _FilesScreenState extends State<FilesScreen> {
                   }
                   return SingleChildScrollView(
                     physics: ScrollPhysics(),
-                    padding: .fromLTRB(10, 10, 10, 60),
+                    padding: .fromLTRB(4, 4, 4, 60),
                     child: ListView.separated(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
@@ -423,10 +430,13 @@ class _FilesScreenState extends State<FilesScreen> {
                                 ),
                               if (item.lastModified != null)
                                 Text(FormatDates.show(item.lastModified!)),
+                              //Text(FormatDates.dateToString(date: item.lastModified)),
+                              //Text(item.lastModified!),
                               if (item.size != null &&
                                   int.tryParse(item.size!) != null)
                                 Text(FormatBytes.show(int.parse(item.size!))),
                               if (item.typeFile != null) Text(item.typeFile!),
+                              //if (item.href != null) Text(item.href!),
                             ],
                           ),
                           trailing: IconButton(

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path_dart;
 import 'package:path_provider/path_provider.dart';
@@ -34,6 +35,14 @@ class NextcloudApi {
     ),
   );
 
+  final CancelToken cancelToken = CancelToken();
+
+  final cacheOptions = CacheOptions(
+    store: MemCacheStore(), // O HiveCacheStore para persistencia
+    policy: CachePolicy.forceCache, // Prioriza el caché si existe
+    maxStale: const Duration(days: 7),
+  );
+
   String get auth =>
       base64Encode(utf8.encode('${cuenta.userName}:${cuenta.password}'));
 
@@ -48,6 +57,7 @@ class NextcloudApi {
       final response = await dio.get(
         url,
         options: Options(headers: headers, responseType: ResponseType.json),
+        cancelToken: cancelToken,
       );
       if (response.statusCode == 200) {
         if (response.data['ocs']['data'] != null) {
@@ -63,5 +73,8 @@ class NextcloudApi {
     }
   }
 
-  void desconectar() => dio.close();
+  void desconectar() {
+    //cancelToken.cancel('Logged out');
+    dio.close();
+  }
 }

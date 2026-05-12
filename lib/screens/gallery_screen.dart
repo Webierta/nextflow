@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 import '../models/cloud_file.dart';
@@ -11,6 +13,7 @@ import '../utils/format_dates.dart';
 import '../widgets/bottom_bar_app.dart';
 import '../widgets/cuenta_avatar.dart';
 import '../widgets/open_dialog.dart';
+import '../widgets/snackbar_manager.dart';
 import 'open_file_screen.dart';
 
 class GalleryScreen extends StatefulWidget {
@@ -35,6 +38,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
   bool sortByAlpha = false;
   bool sortByDate = true;
   TextEditingController searchController = TextEditingController();
+  double progress = 0;
 
   @override
   void initState() {
@@ -46,17 +50,18 @@ class _GalleryScreenState extends State<GalleryScreen> {
   @override
   void dispose() {
     subscription.cancel();
+    nextcloudApi.cancelToken.cancel();
     searchController.dispose();
     super.dispose();
   }
 
-  void reset() {
+  /*void reset() {
     subscription.cancel();
     setState(() {
       isLoading = false;
       imagesPreview = [];
     });
-  }
+  }*/
 
   void initGallery() {
     setState(() => isLoading = true);
@@ -111,6 +116,47 @@ class _GalleryScreenState extends State<GalleryScreen> {
         .toList();
   }
 
+  void _onUploadProgress(double pro) {
+    setState(() {
+      progress = pro / 100;
+      if (pro >= 100) {
+        progress = 0;
+      }
+    });
+  }
+
+  Future<void> uploadImage() async {
+    FilePickerResult? result = await FilePicker.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'png'],
+    );
+    if (result == null) return;
+    File file = File(result.files.single.path!);
+    bool responseUpload = await nextcloudApi.uploadFile(
+      file: file,
+      remotePath: '/Photos/',
+      onUploadProgress: _onUploadProgress,
+    );
+    if (responseUpload == true) {
+      if (mounted) {
+        SnackbarManager.show(
+          context: context,
+          msg: 'File uploaded successfully!',
+        );
+      }
+      //initFiles();
+      initGallery();
+    } else {
+      if (mounted) {
+        SnackbarManager.show(
+          context: context,
+          msg: 'Upload failed',
+          error: true,
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (isLoading == false && imagesPreview.isEmpty) {
@@ -156,7 +202,20 @@ class _GalleryScreenState extends State<GalleryScreen> {
               onlyAvatar: true,
             ),
           ),
-          title: Text('Gallery'),
+          title: Row(
+            children: [
+              Text('Gallery'),
+              //const SizedBox(width: 4),
+              /*CircleAvatar(
+                child: Text(
+                  searchController.text.isEmpty
+                      ? '${imagesPreview.length}'
+                      : '${getSearchImages().length}',
+                ),
+              ),*/
+              //Text('${getSearchImages().length}'),
+            ],
+          ),
           //backgroundColor: Colors.blue[900],
           /*leading: IconButton(
             onPressed: () {
@@ -168,7 +227,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
           //title: Text('Gallery'),
           //title: TitleAppbar(cuenta: widget.cuenta, title: 'Gallery'),
           actions: [
-            if (searchController.text.isNotEmpty)
+            /*if (searchController.text.isNotEmpty)
               FittedBox(
                 child: InputChip(
                   avatar: CircleAvatar(
@@ -181,7 +240,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                     });
                   },
                 ),
-              ),
+              ),*/
             IconButton(
               tooltip: 'Search image by name',
               onPressed: () async {
@@ -227,7 +286,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
             const SizedBox(width: 10),
           ],
           bottom: PreferredSize(
-            preferredSize: Size.fromHeight(20),
+            //preferredSize: Size.fromHeight(20),
+            preferredSize: const Size.fromHeight(kToolbarHeight),
             child: Align(
               alignment: Alignment.topLeft,
               /*child: Padding(
@@ -240,13 +300,52 @@ class _GalleryScreenState extends State<GalleryScreen> {
               ),*/
               child: Padding(
                 padding: const EdgeInsets.only(left: 10),
-                child: Row(
+                /*child: Row(
                   children: [
                     Text(
                       '${imagesPreview.length} images in ${widget.pathGallery}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+                  ],
+                ),*/
+                child: Row(
+                  //mainAxisAlignment: .spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            maxRadius: 16,
+                            //backgroundColor: Colors.white,
+                            //foregroundColor: Colors.blue,
+                            child: Text('${imagesPreview.length}'),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            widget.pathGallery == '/'
+                                ? 'All'
+                                : ''
+                                      'Home/${widget.pathGallery.substring(1)}',
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (searchController.text.isNotEmpty)
+                      FittedBox(
+                        child: InputChip(
+                          avatar: CircleAvatar(
+                            child: Text('${getSearchImages().length}'),
+                          ),
+                          label: Text(searchController.text),
+                          onDeleted: () {
+                            setState(() {
+                              searchController.clear();
+                            });
+                          },
+                        ),
+                      ),
+                    const Spacer(),
                   ],
                 ),
               ),
@@ -257,6 +356,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
         bottomNavigationBar: BottomBarApp(
           cuenta: widget.cuenta,
           destino: Destino.gallery,
+          funcion: uploadImage,
+          //cancelToken: nextcloudApi.cancelToken,
         ),
         body: (isLoading == true && imagesPreview.isEmpty)
             ? Center(
@@ -269,6 +370,24 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 children: [
                   LayoutBuilder(
                     builder: (context, constraints) {
+                      if (progress > 0) {
+                        return Center(
+                          child: Padding(
+                            padding: .symmetric(horizontal: 40),
+                            child: Column(
+                              mainAxisAlignment: .center,
+                              children: [
+                                Text('Progreso de subida de archivo'),
+                                LinearProgressIndicator(value: progress),
+                                Text(
+                                  '${(progress * 100).toStringAsFixed(1)} %',
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+
                       int columns = (constraints.maxWidth / 150).floor();
                       List<CloudFile> searchImages = imagesPreview;
                       if (searchController.text.isNotEmpty) {

@@ -7,6 +7,11 @@ class FormatDates {
     return DateFormat('d/MM/yyyy - HH:mm').format(dateTime);
   }
 
+  /*static String dateToString(DateTime date) {
+    final formatter = DateFormat('d/MM/yy - HH:mm');
+    return formatter.format(date);
+  }*/
+
   static DateTime toDate(String date) {
     final formatter = DateFormat('EEE, d MMM yyyy HH:mm');
     return formatter.parse(date);

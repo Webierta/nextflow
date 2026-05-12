@@ -43,6 +43,12 @@ class _SharedScreenState extends State<SharedScreen> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    nextcloudApi.cancelToken.cancel();
+    super.dispose();
+  }
+
   Future<void> initShared() async {
     setState(() => isLoading = true);
     allShared = await nextcloudApi.getShared() ?? [];
@@ -235,6 +241,7 @@ class _SharedScreenState extends State<SharedScreen> {
         bottomNavigationBar: BottomBarApp(
           cuenta: widget.cuenta,
           destino: Destino.shared,
+          //cancelToken: nextcloudApi.cancelToken,
           //funcion: null,
         ),
         //floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
@@ -261,7 +268,7 @@ class _SharedScreenState extends State<SharedScreen> {
                   }
                   return SingleChildScrollView(
                     physics: ScrollPhysics(),
-                    padding: .fromLTRB(10, 10, 10, 60),
+                    padding: .fromLTRB(4, 4, 4, 60),
                     child: ListView.separated(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,

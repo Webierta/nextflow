@@ -8,10 +8,13 @@ extension Notes on NextcloudApi {
       'OCS-APIRequest': 'true',
       'Accept': 'application/json',
     };
+    dio.interceptors.add(DioCacheInterceptor(options: cacheOptions));
+
     try {
       final responseNotes = await dio.get(
         url,
         options: Options(headers: headers, responseType: ResponseType.json),
+        cancelToken: cancelToken,
       );
       if (responseNotes.statusCode == 200) {
         var listData = responseNotes.data as List;
@@ -43,6 +46,7 @@ extension Notes on NextcloudApi {
         url,
         options: Options(headers: headers),
         data: {'title': titleNote, 'content': '# Hola\n\nCreada con Nextflow'},
+        cancelToken: cancelToken,
       );
       if (response.statusCode == 200) {
         Note note = Note.fromJson(response.data);
@@ -80,6 +84,7 @@ extension Notes on NextcloudApi {
         '$url/$id',
         options: Options(headers: headers),
         data: data,
+        cancelToken: cancelToken,
       );
       if (responseUpdate.statusCode == 200) {
         return true;

@@ -137,9 +137,14 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
       });
       //getAvatar();
     } else {
-      setState(() {
+      if (cuentaSelect != null) {
+        setState(() {
+          cuentaSelect = null;
+        });
+      }
+      /*setState(() {
         cuentaSelect = cuentaSelect!.copyWith(statusAuth: StatusAuth.denied);
-      });
+      });*/
       if (mounted) {
         SnackbarManager.show(
           context: context,
@@ -265,7 +270,7 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
                 child: IconButton.outlined(
                   tooltip: cuentaSelect!.statusAuth == StatusAuth.login
                       ? 'Desconectar'
-                      : 'Conectar',
+                      : 'Reconectar',
                   onPressed: cuentaSelect!.statusAuth == StatusAuth.login
                       ? desconectarCuenta
                       : conectarCuenta,

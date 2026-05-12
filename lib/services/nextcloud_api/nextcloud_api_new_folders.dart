@@ -12,6 +12,7 @@ extension NewFolders on NextcloudApi {
       final response = await dio.request(
         url,
         options: Options(method: 'MKCOL', headers: headers),
+        cancelToken: cancelToken,
       );
       if (response.statusCode == 201) {
         return true;
@@ -41,6 +42,7 @@ extension NewFolders on NextcloudApi {
         final response = await dio.request(
           destination,
           options: Options(method: 'MKCOL', headers: headers),
+          cancelToken: cancelToken,
         );
         if (response.statusCode == 201) {
           done++;

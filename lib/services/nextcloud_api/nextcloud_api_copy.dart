@@ -30,6 +30,7 @@ extension Copy on NextcloudApi {
       final response = await dio.request(
         url,
         options: Options(method: 'COPY', headers: headers),
+        cancelToken: cancelToken,
       );
       if (response.statusCode == 201 || response.statusCode == 204) {
         return true;
@@ -62,6 +63,7 @@ extension Copy on NextcloudApi {
         final response = await dio.request(
           sourceUrl,
           options: Options(method: 'COPY', headers: headers),
+          cancelToken: cancelToken,
         );
         if (response.statusCode == 201 || response.statusCode == 204) {
           done++;

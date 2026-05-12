@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:nextflow/models/cuenta_nextcloud.dart';
 
 import '../screens/files_screen.dart';
 import '../screens/gallery_screen.dart';
 import '../screens/notes_screen.dart';
 import '../screens/shared_screen.dart';
+import 'cuenta_nextcloud.dart';
 
 enum Destino {
   files(name: 'Files', icon: Icons.folder_open, color: Color(0xFF64B5F6)),
@@ -27,6 +27,7 @@ enum Destino {
   Function() onPageRoute({
     required CuentaNextcloud cuenta,
     required BuildContext context,
+    //CancelToken? cancelToken,
   }) {
     final page = switch (this) {
       Destino.files => FilesScreen(cuenta: cuenta),
@@ -36,6 +37,7 @@ enum Destino {
     };
     return () {
       ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      //cancelToken?.cancel();
       Navigator.of(
         context,
       ).push(MaterialPageRoute<void>(builder: (context) => page));

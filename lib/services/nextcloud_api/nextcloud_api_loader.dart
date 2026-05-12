@@ -17,6 +17,7 @@ extension Loader on NextcloudApi {
           headers: headers,
           responseType: ResponseType.bytes,
         ),
+        cancelToken: cancelToken,
       );
       if (response.statusCode == 200) {
         final Directory? downloadsDir = await getDownloadsDirectory();
@@ -60,6 +61,7 @@ extension Loader on NextcloudApi {
             onUploadProgress?.call(progress);
           }
         },
+        cancelToken: cancelToken,
       );
       if (response.statusCode == 201 || response.statusCode == 204) {
         return true;

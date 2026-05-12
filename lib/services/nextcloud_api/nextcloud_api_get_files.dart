@@ -16,6 +16,7 @@ extension GetFiles on NextcloudApi {
           headers: headers,
           responseType: ResponseType.plain,
         ),
+        cancelToken: cancelToken,
       );
       if (response.statusCode == 207) {
         final document = XmlDocument.parse(response.data);
@@ -55,6 +56,77 @@ extension GetFiles on NextcloudApi {
     }
   }
 
+  /*Future<List<CloudFile>?>? listFiles(
+    String path, {
+    bool onlyDir = false,
+    bool onlyImg = false,
+    String depth = '1',
+  }) async {
+    final server = '${cuenta.server}/remote.php/dav/files/${cuenta.userName}/';
+    var client = dav.newClient(
+      server,
+      user: cuenta.userName,
+      //password: cuenta.password,
+    );
+    Map<String, String> headers = {
+      'Authorization': 'Basic $auth}',
+      //'Depth': 'infinity',
+      'Depth': depth,
+      //'Content-Type': 'application/xml',
+      'Content-Type': 'application/xml; charset="utf-8"',
+      //'Accept-Encoding': 'gzip',
+    };
+    client.setHeaders(headers);
+
+    try {
+      //await client.ping();
+      var files = await client.readDir(path, cancelToken);
+
+      //files.forEach((f) {
+      //print('${f.name} ${f.path} ${f.size} ${f.isDir} ${f.mimeType} ${f.mTime}');
+      //});
+
+      List<CloudFile> cloudFiles = files.map((f) {
+        if (f.name == null || f.mTime == null) {
+          throw Exception('Error al obtener files');
+        }
+        var lastModified = FormatDates.dateToString(f.mTime!);
+        return CloudFile(
+          name: f.name ?? 'No Name',
+          isDirectory: f.isDir ?? false,
+          lastModified: lastModified,
+          // f.mTime?.toString(),
+          size: f.size?.toString(),
+          typeFile: f.mimeType,
+          href: f.path,
+        );
+      }).toList();
+
+      final listaDir = cloudFiles.where((item) => item.isDirectory).toList();
+      listaDir.sort(
+        (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+      );
+      final listaFile = cloudFiles.where((item) => !item.isDirectory).toList();
+      listaFile.sort(
+        (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+      );
+      if (onlyDir == true) return listaDir;
+      if (onlyImg == true) {
+        return listaFile
+            .where(
+              (file) =>
+                  (file.typeFile != null &&
+                  file.typeFile!.startsWith('image/')),
+            )
+            .toList();
+      }
+      return listaDir + listaFile;
+    } catch (e) {
+      print('Error al listar archivos: $e');
+      return null;
+    }
+  }*/
+
   Future<List<CloudFile>?>? getFiles(
     String path, {
     bool onlyDir = false,
@@ -69,7 +141,11 @@ extension GetFiles on NextcloudApi {
       'Depth': depth,
       //'Content-Type': 'application/xml',
       'Content-Type': 'application/xml; charset="utf-8"',
+      //'Accept-Encoding': 'gzip',
     };
+
+    dio.interceptors.add(DioCacheInterceptor(options: cacheOptions));
+
     try {
       final response = await dio.request(
         url,
@@ -78,12 +154,54 @@ extension GetFiles on NextcloudApi {
           headers: headers,
           responseType: ResponseType.plain,
         ),
+        cancelToken: cancelToken,
       );
       if (response.statusCode == 207) {
         final document = XmlDocument.parse(response.data);
         //print(document.toString());
         final responses = document.findAllElements('d:response');
-        final List<CloudFile> listaItems = responses.skip(1).map((node) {
+
+        List<CloudFile> listaItems = [];
+        for (var response in responses) {
+          final href = response.findElements('d:href').first.innerText;
+          final name = Uri.decodeComponent(
+            href.split('/').lastWhere((e) => e.isNotEmpty, orElse: () => '/'),
+          );
+          final prop = response.findAllElements('d:prop').first;
+          final lastModified = prop
+              .findElements('d:getlastmodified')
+              .firstOrNull
+              ?.innerText;
+          final size = prop
+              .findElements('d:getcontentlength')
+              .firstOrNull
+              ?.innerText;
+          final usedBytes = prop
+              .findElements('d:quota-used-bytes')
+              .firstOrNull
+              ?.innerText;
+          final typeFile = prop
+              .findElements('d:getcontenttype')
+              .firstOrNull
+              ?.innerText;
+          final esCarpeta = prop
+              .findElements('d:resourcetype')
+              .first
+              .findElements('d:collection')
+              .isNotEmpty;
+          listaItems.add(
+            CloudFile(
+              name: name,
+              isDirectory: esCarpeta,
+              lastModified: lastModified,
+              size: size ?? usedBytes,
+              typeFile: typeFile,
+              href: href,
+            ),
+          );
+        }
+
+        /*final List<CloudFile> listaItems = responses.skip(1).map((node) {
           final href = node.findElements('d:href').first.innerText;
           final isDir = node.findAllElements('d:collection').isNotEmpty;
           String? contentLength;
@@ -108,8 +226,13 @@ extension GetFiles on NextcloudApi {
               .findAllElements('d:getlastmodified')
               .first
               .innerText;
-          final name = Uri.decodeFull(
+          */ /*final name = Uri.decodeFull(
             href.split('/').where((e) => e.isNotEmpty).last,
+          );*/ /*
+          final name = Uri.decodeComponent(
+            href
+                .split('/')
+                .lastWhere((e) => e.isNotEmpty, orElse: () => 'Raíz'),
           );
           return CloudFile(
             name: name,
@@ -119,7 +242,7 @@ extension GetFiles on NextcloudApi {
             typeFile: typeFile,
             href: href,
           );
-        }).toList();
+        }).toList();*/
         final listaDir = listaItems.where((item) => item.isDirectory).toList();
         listaDir.sort(
           (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),

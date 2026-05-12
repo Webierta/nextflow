@@ -47,7 +47,15 @@ class CloudFile extends OpenFile {
     if (filePath(userName) == null) return null;
     var dirName = path_dart.dirname(filePath(userName)!);
     dirName = dirName.replaceFirst('/', 'Home/');
-    return dirName;
+    dirName = dirName.replaceAll('//', '/');
+    //final decoded = Uri.decodeComponent(dirName);
+    //return decoded;
+    try {
+      return Uri.decodeComponent(dirName);
+    } catch (_) {
+      return dirName.replaceAll('%20', ' ');
+    }
+    //return dirName;
   }
 
   @override
@@ -67,6 +75,7 @@ class CloudFile extends OpenFile {
     }
     if (lastModified != null) {
       detalles['Last Modified'] = FormatDates.show(lastModified!);
+      //detalles['Last Modified'] = lastModified!;
     }
     if (getDirName(userName) != null) {
       detalles['Path'] = getDirName(userName)!;

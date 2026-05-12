@@ -12,6 +12,7 @@ extension Avatar on NextcloudApi {
       final response = await dio.get(
         url,
         options: Options(headers: headers, responseType: ResponseType.json),
+        cancelToken: cancelToken,
       );
       if (response.statusCode == 200) {
         return response.data['ocs']['data']['id'];
@@ -32,6 +33,7 @@ extension Avatar on NextcloudApi {
           headers: {'Authorization': 'Basic $auth}', 'OCS-APIRequest': 'true'},
           responseType: ResponseType.bytes,
         ),
+        cancelToken: cancelToken,
       );
       if (response.statusCode == 200) {
         return Uint8List.fromList(response.data);

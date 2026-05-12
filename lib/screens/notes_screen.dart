@@ -52,6 +52,7 @@ class _NotesScreenState extends State<NotesScreen> {
 
   @override
   void dispose() {
+    nextcloudApi.cancelToken.cancel();
     renameController.dispose();
     super.dispose();
   }
@@ -326,6 +327,7 @@ class _NotesScreenState extends State<NotesScreen> {
           cuenta: widget.cuenta,
           destino: Destino.notes,
           funcion: newNote,
+          //cancelToken: nextcloudApi.cancelToken,
         ),
         body: isLoading
             ? Center(child: CircularProgressIndicator())
@@ -416,7 +418,7 @@ class _NotesScreenState extends State<NotesScreen> {
                   } else {
                     return ListView.separated(
                       shrinkWrap: true,
-                      padding: .fromLTRB(10, 10, 10, 60),
+                      padding: .fromLTRB(4, 4, 4, 60),
                       itemCount: notes.length,
                       itemBuilder: (context, index) {
                         final note = notes[index];

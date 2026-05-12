@@ -10,12 +10,15 @@ class BottomBarApp extends StatelessWidget {
   final Future<void> Function()? funcion;
   final String? depth;
 
+  //final CancelToken cancelToken;
+
   const BottomBarApp({
     super.key,
     required this.cuenta,
     required this.destino,
     this.funcion,
     this.depth = '1',
+    //required this.cancelToken,
   });
 
   @override
@@ -49,7 +52,11 @@ class BottomBarApp extends StatelessWidget {
                   size: 32,
                   color: dest == destino ? Colors.blue : Colors.grey,
                 ),
-                onPressed: dest.onPageRoute(context: context, cuenta: cuenta),
+                onPressed: dest.onPageRoute(
+                  context: context,
+                  cuenta: cuenta,
+                  //cancelToken: cancelToken,
+                ),
               ),
             ),
           const Spacer(),

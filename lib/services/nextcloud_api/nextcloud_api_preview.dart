@@ -22,6 +22,7 @@ extension Preview on NextcloudApi {
           responseType: ResponseType.plain,
         ),
         data: data,
+        cancelToken: cancelToken,
       );
       if (response.statusCode == 207) {
         final document = XmlDocument.parse(response.data);
@@ -50,6 +51,7 @@ extension Preview on NextcloudApi {
           headers: {'Authorization': 'Basic $auth}', 'OCS-APIRequest': 'true'},
           responseType: ResponseType.bytes,
         ),
+        cancelToken: cancelToken,
       );
       if (response.statusCode == 200) {
         return Uint8List.fromList(response.data);
@@ -72,6 +74,7 @@ extension Preview on NextcloudApi {
       final response = await dio.get(
         url,
         options: Options(headers: headers, responseType: ResponseType.plain),
+        cancelToken: cancelToken,
       );
       if (response.statusCode == 200) {
         return response.data;
@@ -91,6 +94,7 @@ extension Preview on NextcloudApi {
       final response = await dio.get(
         url,
         options: Options(headers: headers, responseType: ResponseType.bytes),
+        cancelToken: cancelToken,
       );
       if (response.statusCode == 200) {
         return response.data;

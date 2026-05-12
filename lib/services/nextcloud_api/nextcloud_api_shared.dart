@@ -8,10 +8,13 @@ extension Shared on NextcloudApi {
       'OCS-APIRequest': 'true',
       'Accept': 'application/json',
     };
+    dio.interceptors.add(DioCacheInterceptor(options: cacheOptions));
+
     try {
       final response = await dio.get(
         url,
         options: Options(headers: headers, responseType: ResponseType.json),
+        cancelToken: cancelToken,
       );
       if (response.statusCode == 200) {
         var listData = response.data['ocs']['data'] as List;
@@ -71,6 +74,7 @@ extension Shared on NextcloudApi {
                 .toIso8601String(),
         },
         options: Options(headers: headers, responseType: ResponseType.json),
+        cancelToken: cancelToken,
       );
 
       if (response.statusCode == 200) {
@@ -100,6 +104,7 @@ extension Shared on NextcloudApi {
       final response = await dio.delete(
         url,
         options: Options(headers: headers),
+        cancelToken: cancelToken,
       );
       if (response.statusCode == 200) {
         //print('Compartición eliminada con éxito');
